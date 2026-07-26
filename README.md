@@ -2,7 +2,14 @@
 
 Projet local de Copilot BI pour poser des questions en langage naturel sur un jeu de donnees SQLite.
 
-Cette V1 fonctionne localement avec :
+Cette V1 est concue pour rester :
+
+- locale
+- simple
+- testable
+- lisible pour un debutant
+
+Elle fonctionne aujourd'hui avec :
 
 - FastAPI
 - LangGraph
@@ -10,6 +17,30 @@ Cette V1 fonctionne localement avec :
 - RAG local sur fichiers Markdown
 - generation SQL deterministe
 - reponses metier deterministes
+
+## Vision
+
+Le projet a deux objectifs simples :
+
+1. repondre aux questions analytiques sur les donnees
+2. repondre aux questions documentaires sur les KPI et regles metier
+
+Exemples :
+
+- `Quel est le chiffre d'affaires par pays ?`
+- `Comment calcule-t-on la marge ?`
+
+## Architecture rapide
+
+```text
+POST /api/chat
+  -> FastAPI
+  -> LangGraph
+  -> Router
+     -> SQL Agent -> SQLite -> Insight Agent
+     -> RAG local -> knowledge_base
+  -> JSON response
+```
 
 ## Fonctionnalites
 - question en langage naturel
@@ -23,6 +54,33 @@ Cette V1 fonctionne localement avec :
 - audit trail
 - API FastAPI
 - orchestration LangGraph
+
+## Etat actuel
+
+Le projet fournit aujourd'hui :
+
+- une route SQL pour les questions analytiques
+- une route RAG pour les questions documentaires
+- un modele BI en etoile dans SQLite
+- un audit simple
+- une suite de tests locale
+
+## Structure principale
+
+```text
+app/
+  agents/
+  api/
+  connectors/
+  core/
+  models/
+  rag/
+  tools/
+knowledge_base/
+scripts/
+tests/
+docs/
+```
 
 ## Prerequis
 - Windows
@@ -103,17 +161,8 @@ Documentation projet :
 - `docs/ARCHITECTURE.md`
 - `docs/TECHNICAL_DOCUMENTATION.md`
 - `docs/DOCUMENTATION_WORKFLOW.md`
+- `CHANGELOG.md`
 
 Regle simple du projet :
 
 - a chaque changement important du code, on met a jour la documentation concernee dans le meme cycle de travail
-
-## Etat actuel
-
-Le projet fournit aujourd'hui :
-
-- une route SQL pour les questions analytiques
-- une route RAG pour les questions documentaires
-- un modele BI en etoile dans SQLite
-- un audit simple
-- une suite de tests locale
