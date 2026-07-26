@@ -1,0 +1,16 @@
+.venv/
+.tmp/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+.env
+
+data/demo.db
+data/audit.jsonl
+
+pytest-cache-files-*/
+
+.DS_Store
+Thumbs.db
