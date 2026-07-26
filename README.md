@@ -1,120 +1,182 @@
-# AI BI Copilot - Local Multi-Agent Analytics
+# AI BI Copilot
 
-Projet local de Copilot BI pour poser des questions en langage naturel sur un jeu de donnees SQLite.
+Local multi-agent BI copilot built with `FastAPI`, `LangGraph`, `SQLite`, and a lightweight offline `RAG`.
 
-Cette V1 est concue pour rester :
+The goal is simple: let a user ask business questions in natural language and route the request to the right engine:
 
-- locale
-- simple
-- testable
-- lisible pour un debutant
+- `SQL` for analytical questions on structured data
+- `RAG` for KPI definitions, business rules, and data documentation
 
-Elle fonctionne aujourd'hui avec :
+This repository is designed as a clean, local-first portfolio project: readable, testable, and easy to run.
 
-- FastAPI
-- LangGraph
-- SQLite
-- RAG local sur fichiers Markdown
-- generation SQL deterministe
-- reponses metier deterministes
+## Why This Project
 
-## Vision
+Business users usually need two kinds of answers:
 
-Le projet a deux objectifs simples :
+1. answers computed from data
+2. answers grounded in business documentation
 
-1. repondre aux questions analytiques sur les donnees
-2. repondre aux questions documentaires sur les KPI et regles metier
+This project combines both in a single API flow.
 
-Exemples :
+Examples:
 
 - `Quel est le chiffre d'affaires par pays ?`
+- `Quels sont les 10 meilleurs clients ?`
 - `Comment calcule-t-on la marge ?`
+- `Quelle est la difference entre Revenue et Margin ?`
 
-## Architecture rapide
+## What It Does
+
+- routes each question to the right path
+- generates read-only SQL for common BI questions
+- executes queries on a local SQLite star schema
+- transforms SQL rows into business-friendly insights
+- retrieves documentation from a local Markdown knowledge base
+- returns grounded documentary answers with sources
+- logs each interaction in a simple audit trail
+
+## Current Architecture
 
 ```text
 POST /api/chat
   -> FastAPI
   -> LangGraph
   -> Router
-     -> SQL Agent -> SQLite -> Insight Agent
-     -> RAG local -> knowledge_base
+     -> SQL Agent -> SQL Guard -> SQLite -> Insight Agent
+     -> RAG Agent -> knowledge_base -> answer with sources
   -> JSON response
 ```
 
-## Fonctionnalites
-- question en langage naturel
-- routage SQL / Power BI / RAG
-- generation SQL
-- generation DAX
-- execution SQL locale avec SQLite
-- RAG local de regles metier
-- analyse automatique
-- guardrails SQL
-- audit trail
-- API FastAPI
-- orchestration LangGraph
+## Tech Stack
 
-## Etat actuel
+- Python
+- FastAPI
+- LangGraph
+- SQLite
+- Pytest
+- local Markdown knowledge base
 
-Le projet fournit aujourd'hui :
+Optional integration code exists for Power BI / DAX, but the current V1 works fully locally.
 
-- une route SQL pour les questions analytiques
-- une route RAG pour les questions documentaires
-- un modele BI en etoile dans SQLite
-- un audit simple
-- une suite de tests locale
+## Key Capabilities
 
-## Structure principale
+### 1. SQL analytics path
+
+Supports deterministic local questions such as:
+
+- total revenue
+- revenue by country
+- top products by revenue
+- top customers
+- revenue by month
+- margin by category
+- margin by country
+
+### 2. Local RAG path
+
+Supports documentary questions such as:
+
+- KPI definitions
+- business rules
+- data model descriptions
+- customer segment explanations
+
+### 3. BI data model
+
+The demo database uses a simple star schema:
+
+- `fact_sales`
+- `dim_customer`
+- `dim_product`
+- `dim_date`
+
+### 4. Safe local execution
+
+- read-only SQL validation
+- no required Internet access
+- no required cloud model
+- no required Azure setup for local V1
+
+## Example API Request
+
+```json
+{
+  "question": "Quel est le chiffre d'affaires par pays ?",
+  "user_id": "demo-user",
+  "source": "auto"
+}
+```
+
+## Example Response Types
+
+### SQL route
+
+```json
+{
+  "route": "sql",
+  "answer": "Le Maroc affiche le chiffre d'affaires le plus eleve...",
+  "sources": []
+}
+```
+
+### RAG route
+
+```json
+{
+  "route": "rag",
+  "answer": "La marge correspond a la difference entre le chiffre d'affaires et le cout.",
+  "sources": [
+    "kpi_dictionary.md",
+    "business_rules.md"
+  ]
+}
+```
+
+## Project Structure
 
 ```text
 app/
-  agents/
-  api/
-  connectors/
-  core/
-  models/
-  rag/
-  tools/
-knowledge_base/
-scripts/
-tests/
-docs/
+  agents/        # router, SQL agent, insight agent, graph
+  api/           # FastAPI routes
+  connectors/    # SQLite, schema metadata, optional Power BI connector
+  core/          # config, audit, optional LLM wrapper
+  models/        # request / response schemas
+  rag/           # loader, retriever, local RAG compatibility layer
+  tools/         # SQL guardrails
+knowledge_base/  # KPI, data dictionary, business rules
+scripts/         # demo database initialization
+tests/           # local automated tests
+docs/            # project and technical documentation
 ```
 
-## Prerequis
-- Windows
-- Python 3.11 recommande
+## Run Locally
 
-## Demarrage sous Windows
-
-### CMD
-
-```cmd
-cd C:\Users\Workspace\Documents\ai-bi-copilot-starter\ai-bi-copilot
-python -m venv .venv
-.\.venv\Scripts\activate.bat
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-copy .env.example .env
-python scripts\init_demo_db.py
-python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
-```
+Recommended runtime: `Python 3.11`
 
 ### PowerShell
 
 ```powershell
-Set-Location C:\Users\Workspace\Documents\ai-bi-copilot-starter\ai-bi-copilot
+Set-Location C:\path\to\ai-bi-copilot
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 Copy-Item .env.example .env
-python scripts/init_demo_db.py
+python scripts\init_demo_db.py
 python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-Si l'activation du venv pose probleme, utilise directement le Python du projet :
+Open:
+
+- `http://127.0.0.1:8000/docs`
+
+Quick health check:
+
+```powershell
+Invoke-WebRequest http://127.0.0.1:8000/health
+```
+
+If virtual environment activation is blocked, use:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
@@ -122,47 +184,51 @@ Si l'activation du venv pose probleme, utilise directement le Python du projet :
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-Ouvrir ensuite `http://127.0.0.1:8000/docs`.
+## Local-Only Design
 
-Verifier rapidement que l'API repond :
+The current V1 is intentionally local-first:
 
-```powershell
-Invoke-WebRequest http://127.0.0.1:8000/health
-```
+- no Azure required
+- no SQL Server required
+- no Power BI environment required
+- no Internet required for the main SQL and RAG flows
 
-Exemple de payload pour `POST /api/chat` :
-
-```json
-{
-  "question": "Quel est le chiffre d'affaires par pays ?",
-  "user_id": "anas",
-  "source": "auto"
-}
-```
-
-## Mode local
-
-La V1 locale fonctionne sans Azure OpenAI, sans SQL Server et sans Power BI configure.
-Dans ce cas, le projet utilise des reponses deterministes pour le SQL, le DAX et le resume metier.
-
-## Variables optionnelles
-
-Le fichier `.env.example` se concentre sur la V1 locale et laisse seulement les options encore supportees par le code actuel.
-
-## Suite
-
-Voir `docs/ROADMAP.md` et `docs/DEMO_SCRIPT.md`.
+This makes the project easy to understand, test, and demonstrate.
 
 ## Documentation
-
-Documentation projet :
 
 - `docs/PROJECT_OVERVIEW.md`
 - `docs/ARCHITECTURE.md`
 - `docs/TECHNICAL_DOCUMENTATION.md`
 - `docs/DOCUMENTATION_WORKFLOW.md`
+- `docs/ROADMAP.md`
+- `docs/DEMO_SCRIPT.md`
 - `CHANGELOG.md`
 
-Regle simple du projet :
+## What Makes It Interesting
 
-- a chaque changement important du code, on met a jour la documentation concernee dans le meme cycle de travail
+This project is a good showcase of:
+
+- API design with FastAPI
+- workflow orchestration with LangGraph
+- deterministic agent design
+- BI-oriented SQL generation
+- star schema modeling
+- offline RAG on local business documentation
+- readable testing for a multi-agent local system
+
+## Status
+
+Current state:
+
+- local V1 working
+- SQL path working
+- RAG path working
+- automated tests in place
+- GitHub repository initialized
+
+## Notes
+
+- This repository contains only local demo data and project documentation.
+- No confidential production data is included.
+- External integrations remain optional and are not required to run the local version.
