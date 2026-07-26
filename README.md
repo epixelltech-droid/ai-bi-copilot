@@ -1,6 +1,15 @@
-# AI BI Copilot - Multi-Agent Analytics
+# AI BI Copilot - Local Multi-Agent Analytics
 
 Projet local de Copilot BI pour poser des questions en langage naturel sur un jeu de donnees SQLite.
+
+Cette V1 fonctionne localement avec :
+
+- FastAPI
+- LangGraph
+- SQLite
+- RAG local sur fichiers Markdown
+- generation SQL deterministe
+- reponses metier deterministes
 
 ## Fonctionnalites
 - question en langage naturel
@@ -91,9 +100,20 @@ Voir `docs/ROADMAP.md` et `docs/DEMO_SCRIPT.md`.
 Documentation projet :
 
 - `docs/PROJECT_OVERVIEW.md`
+- `docs/ARCHITECTURE.md`
 - `docs/TECHNICAL_DOCUMENTATION.md`
 - `docs/DOCUMENTATION_WORKFLOW.md`
 
 Regle simple du projet :
 
 - a chaque changement important du code, on met a jour la documentation concernee dans le meme cycle de travail
+
+## Etat actuel
+
+Le projet fournit aujourd'hui :
+
+- une route SQL pour les questions analytiques
+- une route RAG pour les questions documentaires
+- un modele BI en etoile dans SQLite
+- un audit simple
+- une suite de tests locale
