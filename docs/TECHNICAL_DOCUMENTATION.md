@@ -26,6 +26,7 @@ Main route file:
 
 Important endpoints:
 
+- `GET /`
 - `GET /health`
 - `POST /api/chat`
 
@@ -37,6 +38,8 @@ Important endpoints:
 - the returned data rows if relevant
 - the audit id
 - sources for RAG answers
+
+`GET /` serves a lightweight local demo interface that calls the same `POST /api/chat` endpoint.
 
 ## LangGraph Layer
 

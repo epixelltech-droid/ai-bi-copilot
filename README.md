@@ -47,6 +47,8 @@ POST /api/chat
   -> JSON response
 ```
 
+The app also exposes a lightweight local demo UI at `/` for trying the project without going through Swagger first.
+
 ## Architecture Diagram
 
 ```mermaid
@@ -281,6 +283,7 @@ python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
 Open:
 
+- `http://127.0.0.1:8000/`
 - `http://127.0.0.1:8000/docs`
 
 Quick health check:

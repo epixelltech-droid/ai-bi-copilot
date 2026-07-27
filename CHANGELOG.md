@@ -29,6 +29,7 @@ The format is intentionally simple for this local project.
 - Improved local RAG retrieval scoring with more BI synonyms and better keyword weighting.
 - Improved RAG answer synthesis for KPI definitions, KPI differences, country explanations, segment definitions, and top product rules.
 - Improved Router coverage for documentary formulations such as "que veut dire", "a quoi correspond", and "comment est defini".
+- Added a lightweight local demo UI at `/` for testing the copilot without going through Swagger first.
 
 ## 2026-07-26
 

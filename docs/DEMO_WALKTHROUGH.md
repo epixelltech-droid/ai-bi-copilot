@@ -17,10 +17,12 @@ The objective is to show:
 
 Open:
 
+- `http://127.0.0.1:8000/`
 - `http://127.0.0.1:8000/docs`
 
 What to say:
 
+- the project now includes a lightweight local demo UI for quick product-style testing
 - the project exposes a simple FastAPI interface
 - the main endpoint is `POST /api/chat`
 - the same endpoint can route to SQL or RAG depending on the question

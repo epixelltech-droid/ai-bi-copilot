@@ -35,6 +35,14 @@ def test_health(client):
     assert response.json() == {"status": "ok"}
 
 
+def test_home_page(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "AI BI Copilot Demo" in response.text
+    assert "Run question" in response.text
+
+
 def test_chat_sql_mode(client):
     response = client.post(
         "/api/chat",
