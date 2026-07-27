@@ -25,6 +25,9 @@ def test_kpi_dictionary_contains_main_kpis():
     assert "Revenue" in content
     assert "Margin" in content
     assert "Margin %" in content
+    assert "Gross Margin" in content
+    assert "Average Selling Price" in content
+    assert "ASP" in content
 
 
 def test_data_dictionary_contains_star_schema_tables():
@@ -34,6 +37,11 @@ def test_data_dictionary_contains_star_schema_tables():
     assert "dim_customer" in content
     assert "dim_product" in content
     assert "dim_date" in content
+    assert "SMB" in content
+    assert "Retail" in content
+    assert "Enterprise" in content
+    assert "Country always comes from" in content
+    assert "Category is used to group products" in content
 
 
 def test_business_rules_contains_revenue_and_non_hallucination_rules():
@@ -42,3 +50,6 @@ def test_business_rules_contains_revenue_and_non_hallucination_rules():
     assert "Revenue" in content
     assert "must never invent" in content
     assert "must not invent a cause" in content
+    assert "Average Selling Price" in content
+    assert "Gross Margin" in content
+    assert "top product by quantity" in content

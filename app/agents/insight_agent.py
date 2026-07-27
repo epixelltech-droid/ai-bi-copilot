@@ -13,8 +13,11 @@ def build_insight(question: str, rows: list[dict], context: list[dict]) -> str:
     if not rows:
         return "Aucune donnée ne correspond à la requête."
 
-    prompt = json.dumps({"question": question, "rows": rows[:30], "context": context},
-                        ensure_ascii=False, default=str)
+    prompt = json.dumps(
+        {"question": question, "rows": rows[:30], "context": context},
+        ensure_ascii=False,
+        default=str,
+    )
     result = llm_text(SYSTEM, prompt)
     if result:
         return result
@@ -33,11 +36,23 @@ def build_insight(question: str, rows: list[dict], context: list[dict]) -> str:
     if "country" in first and "margin" in first:
         return _build_ranking_insight(rows, "country", "margin", "Le pays")
 
+    if "segment" in first and "revenue" in first:
+        return _build_ranking_insight(rows, "segment", "revenue", "Le segment")
+
+    if "segment" in first and "margin" in first:
+        return _build_ranking_insight(rows, "segment", "margin", "Le segment")
+
+    if "product_name" in first and "quantity" in first:
+        return _build_ranking_insight(rows, "product_name", "quantity", "Le produit")
+
     if "product_name" in first and "revenue" in first:
         return _build_ranking_insight(rows, "product_name", "revenue", "Le produit")
 
     if "customer_name" in first and "revenue" in first:
         return _build_ranking_insight(rows, "customer_name", "revenue", "Le client")
+
+    if "category" in first and "revenue" in first:
+        return _build_ranking_insight(rows, "category", "revenue", "La catégorie")
 
     if "category" in first and "margin" in first:
         return _build_ranking_insight(rows, "category", "margin", "La catégorie")
@@ -45,13 +60,25 @@ def build_insight(question: str, rows: list[dict], context: list[dict]) -> str:
     if "year" in first and "month" in first and "revenue" in first:
         return _build_time_insight(rows)
 
+    if "year" in first and "revenue" in first:
+        return _build_year_insight(rows, "revenue")
+
+    if "year" in first and "margin" in first:
+        return _build_year_insight(rows, "margin")
+
     return f"La requête a retourné {len(rows)} ligne(s)."
 
 
 def _build_ranking_insight(rows: list[dict], label_key: str, metric_key: str, subject: str) -> str:
     ordered_rows = sorted(rows, key=lambda row: row[metric_key], reverse=True)
     top_rows = ordered_rows[:3]
-    metric_label = "chiffre d'affaires" if metric_key == "revenue" else "marge"
+
+    if metric_key == "revenue":
+        metric_label = "chiffre d'affaires"
+    elif metric_key == "margin":
+        metric_label = "marge"
+    else:
+        metric_label = "quantité"
 
     if len(top_rows) == 1:
         leader = top_rows[0]
@@ -78,6 +105,16 @@ def _build_time_insight(rows: list[dict]) -> str:
         f"Le niveau le plus bas est observé en {low_row['month_name']} {low_row['year']} "
         f"avec {_format_number(low_row['revenue'])}. "
         f"L'analyse couvre {period_count} période(s)."
+    )
+
+
+def _build_year_insight(rows: list[dict], metric_key: str) -> str:
+    ordered_rows = sorted(rows, key=lambda row: row["year"])
+    top_row = max(ordered_rows, key=lambda row: row[metric_key])
+    metric_label = "chiffre d'affaires" if metric_key == "revenue" else "marge"
+    return (
+        f"La {metric_label} pour {top_row['year']} est de {_format_number(top_row[metric_key])}. "
+        f"L'analyse couvre {len(ordered_rows)} année(s)."
     )
 
 

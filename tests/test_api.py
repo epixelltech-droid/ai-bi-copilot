@@ -130,3 +130,375 @@ def test_chat_unknown_documentary_question_returns_safe_rag_answer(client):
     assert body["artifact"]["language"] == "NONE"
     assert body["answer"] == "Je n'ai pas trouve cette information dans la base documentaire."
     assert body["sources"] == []
+
+
+def test_chat_sql_short_variant_routes_to_sql(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "CA par pays",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert body["answer"]
+
+
+def test_chat_sql_monthly_variant_routes_to_sql(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "revenu mensuel",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert body["answer"]
+
+
+def test_chat_rag_definition_variant_routes_to_rag(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "definition de margin",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "rag"
+    assert body["artifact"]["language"] == "NONE"
+    assert body["answer"]
+
+
+def test_chat_rag_c_est_quoi_variant_routes_to_rag(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "c'est quoi revenue",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "rag"
+    assert body["artifact"]["language"] == "NONE"
+    assert body["answer"]
+
+
+def test_chat_rag_asp_question_routes_to_rag(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Comment calcule-t-on l'ASP ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "rag"
+    assert body["artifact"]["language"] == "NONE"
+    assert "Revenue / Quantity" in body["answer"]
+    assert "kpi_dictionary.md" in body["sources"]
+
+
+def test_chat_rag_smb_question_routes_to_rag(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Que veut dire SMB ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "rag"
+    assert body["artifact"]["language"] == "NONE"
+    assert "SMB" in body["answer"]
+    assert "data_dictionary.md" in body["sources"]
+
+
+def test_chat_rag_top_product_question_routes_to_rag(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Comment est defini un top product ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "rag"
+    assert body["artifact"]["language"] == "NONE"
+    assert "top product" in body["answer"].lower()
+    assert "business_rules.md" in body["sources"]
+
+
+def test_chat_rag_country_question_routes_to_rag(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "A quoi correspond le pays dans les analyses ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "rag"
+    assert body["artifact"]["language"] == "NONE"
+    assert "customer" in body["answer"].lower() or "client" in body["answer"].lower()
+    assert body["sources"]
+
+
+def test_chat_sql_revenue_by_segment_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires par segment ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert "JOIN dim_customer c" in body["artifact"]["query"]
+    assert body["data"]
+    assert body["answer"]
+
+
+def test_chat_sql_margin_by_segment_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quelle est la marge par segment ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert "SUM(f.margin)" in body["artifact"]["query"]
+    assert body["data"]
+    assert body["answer"]
+
+
+def test_chat_sql_revenue_by_category_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires par categorie ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert "JOIN dim_product p" in body["artifact"]["query"]
+    assert body["data"]
+    assert body["answer"]
+
+
+def test_chat_sql_top_5_products_by_quantity_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le top 5 des produits en quantite ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert "SUM(f.quantity) AS quantity" in body["artifact"]["query"]
+    assert body["data"]
+    assert body["answer"]
+
+
+def test_chat_sql_top_retail_customers_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quels sont les clients Retail les plus performants ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert "WHERE c.segment = 'Retail'" in body["artifact"]["query"]
+    assert body["data"]
+    assert body["answer"]
+
+
+def test_chat_sql_revenue_for_2025_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires en 2025 ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert "WHERE d.year = 2025" in body["artifact"]["query"]
+    assert body["data"]
+    assert body["answer"]
+
+
+def test_chat_sql_revenue_for_2026_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires en 2026 ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert "WHERE d.year = 2026" in body["artifact"]["query"]
+    assert body["data"]
+    assert body["answer"]
+
+
+def test_chat_sql_revenue_by_country_for_2025_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires par pays en 2025 ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert "WHERE d.year = 2025" in body["artifact"]["query"]
+    assert "JOIN dim_customer c" in body["artifact"]["query"]
+    assert body["data"]
+    assert body["answer"]
+
+
+def test_chat_sql_revenue_by_country_for_2026_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires par pays en 2026 ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert "WHERE d.year = 2026" in body["artifact"]["query"]
+    assert "JOIN dim_customer c" in body["artifact"]["query"]
+    assert body["data"]
+    assert body["answer"]
+
+
+def test_chat_sql_margin_for_2025_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quelle est la marge en 2025 ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert "WHERE d.year = 2025" in body["artifact"]["query"]
+    assert "SUM(f.margin)" in body["artifact"]["query"]
+    assert body["data"]
+    assert body["answer"]
+
+
+def test_chat_sql_margin_for_2026_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quelle est la marge en 2026 ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert "WHERE d.year = 2026" in body["artifact"]["query"]
+    assert "SUM(f.margin)" in body["artifact"]["query"]
+    assert body["data"]
+    assert body["answer"]

@@ -32,13 +32,23 @@ A top customer is ranked by total Revenue unless the user explicitly asks for an
 
 A top product is ranked by total Revenue unless the user explicitly asks for quantity.
 
+If the user asks for "top product by quantity", "most sold product", or "best product in quantity", products must be ranked by total Quantity instead of Revenue.
+
+If the user only says "top product" without a metric, use total Revenue.
+
 ## 7. Country
 
 Country corresponds to the country of the customer, not the product.
 
+Country analysis should join sales with the customer dimension and use `dim_customer.country`.
+
 ## 8. Dates
 
 Monthly, quarterly, and yearly analyses must use `dim_date`.
+
+Year filters such as 2025 or 2026 must use `dim_date.year`.
+
+Month filters such as January 2026 must use `dim_date.month` and `dim_date.year`.
 
 ## 9. Missing data
 
@@ -47,3 +57,31 @@ The system must never invent a missing value or fill a metric without data suppo
 ## 10. Causality
 
 The system may describe a variation, a ranking, or a trend, but it must not invent a cause unless the available data demonstrates it.
+
+## 11. Average Selling Price
+
+Average Selling Price is calculated as:
+
+`Average Selling Price = Revenue / Quantity`
+
+ASP is the abbreviation of Average Selling Price.
+
+## 12. Gross Margin
+
+Gross Margin is calculated as:
+
+`Gross Margin = Revenue - Cost`
+
+In this demo model, Gross Margin and Margin refer to the same KPI.
+
+## 13. Segment analysis
+
+Segment analysis uses `dim_customer.segment`.
+
+The available customer segments are Enterprise, SMB, and Retail.
+
+## 14. Category analysis
+
+Category analysis uses `dim_product.category`.
+
+The available product categories are IT, Office, and Accessories.

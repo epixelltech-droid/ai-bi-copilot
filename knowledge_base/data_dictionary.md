@@ -34,6 +34,16 @@ Each row in `fact_sales` represents one sales transaction.
 - `SMB`: small and medium-sized business customers.
 - `Retail`: smaller customers or retail-style demand.
 
+Segment is used to compare customer groups. In this demo model, the available segments are Enterprise, SMB, and Retail.
+
+SMB means small and medium-sized business. SMB customers are usually smaller than Enterprise customers but still represent business accounts.
+
+Retail represents smaller customers or retail-style demand. Retail analysis is useful for understanding performance among smaller customer profiles.
+
+Enterprise represents larger customer accounts. Enterprise analysis is useful for understanding performance among larger customers.
+
+Country always comes from `dim_customer.country`. In this model, a country analysis means the country of the customer, not the product and not the warehouse.
+
 ## TABLE dim_product
 
 - `product_id`: unique product identifier.
@@ -46,6 +56,14 @@ Each row in `fact_sales` represents one sales transaction.
 - `IT`
 - `Office`
 - `Accessories`
+
+Category is used to group products into business families. Category analysis is useful for comparing Revenue, Cost, Margin, Quantity, or Average Selling Price across product families.
+
+IT contains technology-oriented products.
+
+Office contains workplace and office supply products.
+
+Accessories contains add-on products and smaller complementary items.
 
 ## TABLE dim_date
 

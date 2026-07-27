@@ -16,13 +16,18 @@ def route_question(question: str, preferred: str = "auto") -> str:
 
     documentary_patterns = [
         "definition",
+        "definition de",
+        "a quoi correspond",
         "que signifie",
+        "que veut dire",
         "qu est ce",
-        "qu'est ce",
         "quest ce",
+        "c est quoi",
+        "c quoi",
         "comment calcule",
         "comment definit",
         "comment definit on",
+        "comment est defini",
         "definit on",
         "regle metier",
         "regles metier",
@@ -30,6 +35,7 @@ def route_question(question: str, preferred: str = "auto") -> str:
         "difference entre",
         "diff rence entre",
         "top customer",
+        "top product",
     ]
 
     if any(pattern in q for pattern in documentary_patterns):

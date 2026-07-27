@@ -141,3 +141,72 @@ def test_answer_ebitda_is_safe_and_empty_sources():
 
     assert result["answer"] == "Je n'ai pas trouve cette information dans la base documentaire."
     assert result["sources"] == []
+
+
+def test_retrieve_asp_synonym_returns_average_selling_price_chunk():
+    chunks = retrieve("Comment calcule-t-on l'ASP ?", k=3)
+
+    assert chunks
+    assert any("Average Selling Price" in chunk["text"] for chunk in chunks)
+    assert any(chunk["source"] == "kpi_dictionary.md" for chunk in chunks)
+
+
+def test_answer_asp_contains_formula():
+    chunks = retrieve("Comment calcule-t-on l'ASP ?", k=3)
+    result = answer_from_context("Comment calcule-t-on l'ASP ?", chunks)
+
+    assert "Average Selling Price" in result["answer"]
+    assert "Revenue / Quantity" in result["answer"]
+    assert "kpi_dictionary.md" in result["sources"]
+
+
+def test_answer_smb_returns_segment_definition():
+    chunks = retrieve("Que veut dire SMB ?", k=3)
+    result = answer_from_context("Que veut dire SMB ?", chunks)
+
+    assert "SMB" in result["answer"]
+    assert "small and medium-sized business" in result["answer"]
+    assert "data_dictionary.md" in result["sources"]
+
+
+def test_answer_difference_between_cost_and_margin_is_structured():
+    chunks = retrieve("Quelle est la difference entre cost et margin ?", k=4)
+    result = answer_from_context("Quelle est la difference entre cost et margin ?", chunks)
+
+    assert "Cost :" in result["answer"]
+    assert "Margin :" in result["answer"]
+    assert "Revenue - Cost" in result["answer"]
+
+
+def test_answer_top_product_returns_business_rule():
+    chunks = retrieve("Comment est defini un top product ?", k=3)
+    result = answer_from_context("Comment est defini un top product ?", chunks)
+
+    assert "top product" in result["answer"].lower()
+    assert "Revenue" in result["answer"]
+    assert "business_rules.md" in result["sources"]
+
+
+def test_answer_country_explains_customer_country():
+    chunks = retrieve("A quoi correspond le pays dans les analyses ?", k=3)
+    result = answer_from_context("A quoi correspond le pays dans les analyses ?", chunks)
+
+    assert "country" in result["answer"].lower() or "pays" in result["answer"].lower()
+    assert "customer" in result["answer"].lower() or "client" in result["answer"].lower()
+    assert any(source in result["sources"] for source in ["data_dictionary.md", "business_rules.md"])
+
+
+def test_short_margin_percent_question_is_understood():
+    chunks = retrieve("Margin %", k=3)
+    result = answer_from_context("Margin %", chunks)
+
+    assert "Margin %" in result["answer"]
+    assert "Margin / Revenue x 100" in result["answer"]
+
+
+def test_unknown_kpi_question_stays_safe():
+    chunks = retrieve("Que veut dire net promoter score ?", k=3)
+    result = answer_from_context("Que veut dire net promoter score ?", chunks)
+
+    assert result["answer"] == "Je n'ai pas trouve cette information dans la base documentaire."
+    assert result["sources"] == []
