@@ -47,6 +47,25 @@ POST /api/chat
   -> JSON response
 ```
 
+## Architecture Diagram
+
+```mermaid
+flowchart LR
+    U[User Question] --> API[FastAPI API]
+    API --> G[LangGraph]
+    G --> R[Router]
+    R --> SQL[SQL Agent]
+    R --> RAG[RAG Agent]
+    SQL --> GUARD[SQL Guard]
+    GUARD --> DB[(SQLite Star Schema)]
+    DB --> INSIGHT[Insight Agent]
+    RAG --> KB[(Markdown Knowledge Base)]
+    KB --> ANSWER[RAG Answer Builder]
+    INSIGHT --> RESP[JSON Response]
+    ANSWER --> RESP
+    RESP --> AUDIT[Audit Log]
+```
+
 ## Tech Stack
 
 - Python
@@ -97,6 +116,27 @@ The demo database uses a simple star schema:
 - no required cloud model
 - no required Azure setup for local V1
 
+## Sample Questions
+
+### Analytical questions
+
+- `Quel est le chiffre d'affaires total ?`
+- `Quel est le chiffre d'affaires par pays ?`
+- `Quel est le top 5 des produits par chiffre d'affaires ?`
+- `Quels sont les 10 meilleurs clients ?`
+- `Quelle est la marge par categorie ?`
+- `Quelle est la marge par pays en 2026 ?`
+- `Quel est le chiffre d'affaires par mois ?`
+
+### Documentary questions
+
+- `Comment calcule-t-on la marge ?`
+- `Que signifie Revenue ?`
+- `Quelle est la difference entre Revenue et Margin ?`
+- `Qu'est-ce qu'un client Enterprise ?`
+- `Comment definit-on un top customer ?`
+- `Quelles sont les regles metier ?`
+
 ## Example API Request
 
 ```json
@@ -131,6 +171,28 @@ The demo database uses a simple star schema:
   ]
 }
 ```
+
+## Example Outputs
+
+### Example 1 - SQL insight
+
+Question:
+
+`Quel est le chiffre d'affaires par pays ?`
+
+Typical answer:
+
+`Le Maroc affiche le chiffre d'affaires le plus eleve, suivi de l'Italie puis de l'Espagne.`
+
+### Example 2 - Documentary answer
+
+Question:
+
+`Comment calcule-t-on la marge ?`
+
+Typical answer:
+
+`La marge correspond a la difference entre le chiffre d'affaires et le cout. Formule : Margin = Revenue - Cost.`
 
 ## Project Structure
 
