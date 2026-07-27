@@ -194,6 +194,21 @@ Typical answer:
 
 `La marge correspond a la difference entre le chiffre d'affaires et le cout. Formule : Margin = Revenue - Cost.`
 
+## Demo Walkthrough
+
+A simple demo flow for interviews or portfolio review:
+
+1. open `http://127.0.0.1:8000/docs`
+2. verify `GET /health`
+3. test a SQL question such as `Quel est le chiffre d'affaires par pays ?`
+4. test another SQL question such as `Quels sont les 10 meilleurs clients ?`
+5. test a RAG question such as `Comment calcule-t-on la marge ?`
+6. show that the RAG answer returns sources
+
+Detailed walkthrough:
+
+- `docs/DEMO_WALKTHROUGH.md`
+
 ## Project Structure
 
 ```text
@@ -265,6 +280,8 @@ This makes the project easy to understand, test, and demonstrate.
 - `docs/DOCUMENTATION_WORKFLOW.md`
 - `docs/ROADMAP.md`
 - `docs/DEMO_SCRIPT.md`
+- `docs/DEMO_WALKTHROUGH.md`
+- `docs/PRODUCT_NEXT_STEPS.md`
 - `CHANGELOG.md`
 
 ## What Makes It Interesting
