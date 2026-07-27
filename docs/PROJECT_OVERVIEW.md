@@ -56,8 +56,10 @@ Flow:
   - `dim_product`
   - `dim_date`
 - deterministic SQL generation for common BI questions
+- deterministic SQL coverage for segment, category, quantity, and year-filtered questions
 - deterministic business insight generation
 - local offline RAG over Markdown files
+- improved local RAG over KPI definitions, business rules, and data dictionary content
 - SQL safety validation
 - audit logging
 - automated tests

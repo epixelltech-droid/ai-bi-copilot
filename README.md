@@ -85,11 +85,19 @@ Supports deterministic local questions such as:
 
 - total revenue
 - revenue by country
+- revenue by country for 2025 or 2026
+- revenue by segment
+- revenue by category
 - top products by revenue
+- top products by quantity
 - top customers
+- top Retail customers
 - revenue by month
+- revenue for 2025 or 2026
 - margin by category
 - margin by country
+- margin by segment
+- margin for 2025 or 2026
 
 ### 2. Local RAG path
 
@@ -99,6 +107,9 @@ Supports documentary questions such as:
 - business rules
 - data model descriptions
 - customer segment explanations
+- KPI synonyms such as `ASP` and `Gross Margin`
+- differences between KPIs such as `Revenue`, `Cost`, and `Margin`
+- country and category interpretation rules
 
 ### 3. BI data model
 
@@ -122,19 +133,32 @@ The demo database uses a simple star schema:
 
 - `Quel est le chiffre d'affaires total ?`
 - `Quel est le chiffre d'affaires par pays ?`
+- `Quel est le chiffre d'affaires par pays en 2026 ?`
+- `Quel est le chiffre d'affaires par segment ?`
+- `Quel est le chiffre d'affaires par categorie ?`
 - `Quel est le top 5 des produits par chiffre d'affaires ?`
+- `Quel est le top 5 des produits en quantite ?`
+- `Quels sont les clients Retail les plus performants ?`
 - `Quels sont les 10 meilleurs clients ?`
 - `Quelle est la marge par categorie ?`
 - `Quelle est la marge par pays en 2026 ?`
+- `Quelle est la marge par segment ?`
+- `Quelle est la marge en 2025 ?`
 - `Quel est le chiffre d'affaires par mois ?`
 
 ### Documentary questions
 
 - `Comment calcule-t-on la marge ?`
 - `Que signifie Revenue ?`
+- `Que signifie Margin % ?`
+- `Comment calcule-t-on l'ASP ?`
+- `Que veut dire SMB ?`
 - `Quelle est la difference entre Revenue et Margin ?`
+- `Quelle est la difference entre Cost et Margin ?`
 - `Qu'est-ce qu'un client Enterprise ?`
 - `Comment definit-on un top customer ?`
+- `Comment est defini un top product ?`
+- `A quoi correspond le pays dans les analyses ?`
 - `Quelles sont les regles metier ?`
 
 ## Example API Request
@@ -194,6 +218,16 @@ Typical answer:
 
 `La marge correspond a la difference entre le chiffre d'affaires et le cout. Formule : Margin = Revenue - Cost.`
 
+### Example 3 - Short documentary answer
+
+Question:
+
+`Que veut dire SMB ?`
+
+Typical answer:
+
+`SMB means small and medium-sized business. SMB customers are usually smaller than Enterprise customers but still represent business accounts.`
+
 ## Demo Walkthrough
 
 A simple demo flow for interviews or portfolio review:
@@ -201,9 +235,11 @@ A simple demo flow for interviews or portfolio review:
 1. open `http://127.0.0.1:8000/docs`
 2. verify `GET /health`
 3. test a SQL question such as `Quel est le chiffre d'affaires par pays ?`
-4. test another SQL question such as `Quels sont les 10 meilleurs clients ?`
-5. test a RAG question such as `Comment calcule-t-on la marge ?`
-6. show that the RAG answer returns sources
+4. test another SQL question such as `Quel est le top 5 des produits en quantite ?`
+5. test a year-filtered SQL question such as `Quel est le chiffre d'affaires en 2026 ?`
+6. test a RAG question such as `Comment calcule-t-on l'ASP ?`
+7. test a short documentary question such as `Que veut dire SMB ?`
+8. show that the RAG answer returns sources
 
 Detailed walkthrough:
 
@@ -303,7 +339,7 @@ Current state:
 - local V1 working
 - SQL path working
 - RAG path working
-- automated tests in place
+- `116` automated tests passing
 - GitHub repository initialized
 
 ## Notes

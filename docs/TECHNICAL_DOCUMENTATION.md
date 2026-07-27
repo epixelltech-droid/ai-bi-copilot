@@ -82,6 +82,7 @@ Role:
 Current behavior:
 
 - deterministic handling for common BI questions
+- support for segment, category, year, quantity, and country-based analytical questions
 - optional LLM path if configured
 - uses schema metadata from `app/connectors/schema_metadata.py`
 - always sends generated SQL through `validate_readonly_sql()`
@@ -102,6 +103,7 @@ Current approach:
 - ranking summaries
 - KPI summaries
 - time-based summaries
+- year-based summaries
 - safe fallback when the returned structure is unknown
 
 ## Local RAG
@@ -120,9 +122,18 @@ Current approach:
 
 1. load `.md` files from `knowledge_base/`
 2. split documents into chunks
-3. score chunks with keyword matching
+3. score chunks with keyword matching, simple BI synonyms, and title weighting
 4. return top chunks
 5. build a short deterministic answer from the retrieved context
+
+The local RAG now covers questions such as:
+
+- KPI definitions
+- KPI synonyms like `ASP`
+- customer segment meaning like `SMB`
+- differences between KPIs
+- top customer and top product business rules
+- country meaning in the reporting model
 
 No embeddings, no Internet, and no cloud model are required.
 
@@ -190,3 +201,7 @@ Main test areas:
 - Insight Agent tests
 
 The project currently relies on local deterministic tests and does not require Internet access.
+
+Current status:
+
+- `116` passing tests in the local suite

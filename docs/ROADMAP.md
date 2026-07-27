@@ -1,6 +1,6 @@
 # Roadmap
 
-Last updated: 2026-07-26
+Last updated: 2026-07-27
 
 ## Current Status
 
@@ -14,6 +14,9 @@ Completed:
 - SQL Agent on the SQLite star schema
 - Insight Agent with readable business answers
 - local offline RAG
+- enriched local knowledge base
+- improved RAG retrieval scoring and answer quality
+- expanded deterministic SQL coverage across segment, category, quantity, and year filters
 - dynamic schema metadata
 - audit logging
 - automated local tests
@@ -32,17 +35,18 @@ Scope delivered:
 - documentary question flow
 - deterministic local behavior
 - no required Internet access
+- `116` passing local tests
 
 ## Phase 2 - Documentation And Presentation
 
-Status: in progress
+Status: active
 
 Next priorities:
 
-- polish the main README for GitHub presentation
-- enrich architecture documentation
-- keep demo scenarios up to date
-- maintain a simple documentation workflow for each change
+- keep demo scenarios and screenshots up to date
+- add one real product screenshot to the GitHub README
+- maintain documentation updates together with code changes
+- keep the public project presentation aligned with the current capabilities
 
 ## Phase 3 - Product Hardening
 
@@ -50,11 +54,11 @@ Status: next
 
 Potential improvements:
 
-- expand SQL coverage for more business questions
+- expand SQL coverage for more cross-filters and ranking cases
 - improve Router coverage for more user phrasings
-- refine RAG scoring and answer quality
+- continue refining RAG scoring and answer synthesis
 - enrich audit information
-- clean temporary local files more systematically
+- add a simple local demo UI
 
 ## Phase 4 - Portfolio / Showcase
 

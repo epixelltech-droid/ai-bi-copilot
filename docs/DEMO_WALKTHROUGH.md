@@ -66,19 +66,31 @@ What to mention:
 
 Use a question such as:
 
-`Quels sont les 10 meilleurs clients ?`
+`Quel est le top 5 des produits en quantite ?`
 
 What to highlight:
 
 - a different business question is mapped to the same SQL path
-- the SQL uses the star schema dimensions and fact table
+- the SQL now supports quantity-based ranking in addition to revenue-based ranking
 - the answer is not just raw rows, but a readable business summary
 
-### 5. Demo the RAG path
+### 5. Demo a year-filtered analytical question
 
 Use a question such as:
 
-`Comment calcule-t-on la marge ?`
+`Quel est le chiffre d'affaires en 2026 ?`
+
+What to highlight:
+
+- the SQL Agent understands a calendar filter
+- the query uses `dim_date.year`
+- the Insight Agent still returns a short business answer
+
+### 6. Demo the RAG path
+
+Use a question such as:
+
+`Comment calcule-t-on l'ASP ?`
 
 What to highlight:
 
@@ -86,16 +98,18 @@ What to highlight:
 - the retriever searches the local Markdown knowledge base
 - the answer is grounded in documentation
 - the API returns the answer with sources
+- synonyms are supported, so `ASP` maps to `Average Selling Price`
 
-### 6. Demo another documentary question
+### 7. Demo another documentary question
 
 Use a question such as:
 
-`Qu'est-ce qu'un client Enterprise ?`
+`Que veut dire SMB ?`
 
 What to highlight:
 
 - the answer comes from the data dictionary and business documentation
+- short documentary questions are also handled
 - no hallucinated value should be introduced
 
 ## Recommended Questions
@@ -104,17 +118,21 @@ What to highlight:
 
 - `Quel est le chiffre d'affaires total ?`
 - `Quel est le chiffre d'affaires par pays ?`
+- `Quel est le chiffre d'affaires en 2026 ?`
 - `Quel est le top 5 des produits par chiffre d'affaires ?`
+- `Quel est le top 5 des produits en quantite ?`
 - `Quelle est la marge par categorie ?`
 - `Quels sont les 10 meilleurs clients ?`
 
 ### RAG
 
 - `Comment calcule-t-on la marge ?`
+- `Comment calcule-t-on l'ASP ?`
 - `Que signifie Revenue ?`
+- `Que veut dire SMB ?`
 - `Quelle est la difference entre Revenue et Margin ?`
-- `Qu'est-ce qu'un client Enterprise ?`
-- `Comment definit-on un top customer ?`
+- `A quoi correspond le pays dans les analyses ?`
+- `Comment est defini un top product ?`
 
 ## Short Presentation Script
 
