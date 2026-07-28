@@ -568,6 +568,17 @@
       font-size: 11px;
     }
 
+    .panel-tools {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .panel-tools input {
+      min-width: 180px;
+    }
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -667,6 +678,8 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      cursor: pointer;
+      user-select: none;
     }
 
     .data-table td {
@@ -678,6 +691,17 @@
 
     .data-table tr:hover td {
       background: rgba(68, 213, 178, 0.04);
+    }
+
+    .th-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sort-indicator {
+      color: var(--accent);
+      font-size: 10px;
     }
 
     .viz-container {
@@ -1073,8 +1097,15 @@
 
           <div class="panel">
             <div class="panel-header">
-              <span class="panel-title">Donnees retournees</span>
-              <span id="rowCountBadge" class="badge badge-neutral">0 ligne</span>
+              <div>
+                <span class="panel-title">Donnees retournees</span>
+                <div class="panel-subtitle">Tri, filtre local et export CSV sur le resultat visible</div>
+              </div>
+              <div class="panel-tools">
+                <input id="tableFilterInput" type="text" placeholder="Filtrer une valeur..." />
+                <button id="exportCsvBtn" class="btn btn-ghost">Exporter CSV</button>
+                <span id="rowCountBadge" class="badge badge-neutral">0 ligne</span>
+              </div>
             </div>
             <div id="tableContainer" class="table-container">
               <div class="empty-state">Aucune ligne retournee pour le moment.</div>
@@ -1129,6 +1160,8 @@
     const sourcesContainer = document.getElementById("sourcesContainer");
     const codeBlock = document.getElementById("codeBlock");
     const tableContainer = document.getElementById("tableContainer");
+    const tableFilterInput = document.getElementById("tableFilterInput");
+    const exportCsvBtn = document.getElementById("exportCsvBtn");
     const copyCodeBtn = document.getElementById("copyCodeBtn");
     const historyList = document.getElementById("historyList");
     const resolvedQuestionValue = document.getElementById("resolvedQuestionValue");
@@ -1141,6 +1174,9 @@
     const statReading = document.getElementById("statReading");
     const statReadingNote = document.getElementById("statReadingNote");
     const vizContainer = document.getElementById("vizContainer");
+    let currentRows = [];
+    let currentVisibleRows = [];
+    let currentSort = { column: null, direction: "asc" };
 
     function currentUserId() {
       return (userIdInput.value || "").trim() || "portfolio-user";
@@ -1162,6 +1198,32 @@
       return new Intl.NumberFormat("fr-FR", {
         maximumFractionDigits: 2
       }).format(value);
+    }
+
+    function downloadCsv(rows) {
+      if (!rows || rows.length === 0) {
+        answerText.textContent = "Aucune ligne visible a exporter en CSV.";
+        return;
+      }
+
+      const columns = Object.keys(rows[0]);
+      const lines = [
+        columns.join(","),
+        ...rows.map((row) =>
+          columns.map((column) => {
+            const value = String(row[column] ?? "").replaceAll('"', '""');
+            return `"${value}"`;
+          }).join(",")
+        )
+      ];
+
+      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "ai-bi-copilot-export.csv";
+      link.click();
+      URL.revokeObjectURL(url);
     }
 
     function updateRouteBadge(route) {
@@ -1194,16 +1256,27 @@
     }
 
     function renderTable(rows) {
-      if (!rows || rows.length === 0) {
+      currentRows = Array.isArray(rows) ? [...rows] : [];
+      const visibleRows = getVisibleRows(currentRows);
+      currentVisibleRows = visibleRows;
+
+      if (!visibleRows || visibleRows.length === 0) {
         rowCountBadge.textContent = "0 ligne";
-        tableContainer.innerHTML = '<div class="empty-state">Aucune donnee tabulaire retournee.</div>';
+        const message = currentRows.length
+          ? "Aucune ligne ne correspond au filtre actuel."
+          : "Aucune donnee tabulaire retournee.";
+        tableContainer.innerHTML = `<div class="empty-state">${message}</div>`;
         return;
       }
 
-      rowCountBadge.textContent = `${rows.length} ligne${rows.length > 1 ? "s" : ""}`;
-      const columns = Object.keys(rows[0]);
-      const ths = columns.map((column) => `<th>${escapeHtml(column)}</th>`).join("");
-      const trs = rows.map((row) => {
+      rowCountBadge.textContent = `${visibleRows.length} ligne${visibleRows.length > 1 ? "s" : ""}`;
+      const columns = Object.keys(visibleRows[0]);
+      const ths = columns.map((column) => {
+        const isSorted = currentSort.column === column;
+        const indicator = isSorted ? (currentSort.direction === "asc" ? "↑" : "↓") : "";
+        return `<th data-column="${escapeHtml(column)}"><span class="th-label">${escapeHtml(column)}<span class="sort-indicator">${indicator}</span></span></th>`;
+      }).join("");
+      const trs = visibleRows.map((row) => {
         const tds = columns
           .map((column) => `<td>${escapeHtml(row[column] !== null && row[column] !== undefined ? row[column] : "")}</td>`)
           .join("");
@@ -1216,6 +1289,65 @@
           <tbody>${trs}</tbody>
         </table>
       `;
+
+      tableContainer.querySelectorAll("th[data-column]").forEach((header) => {
+        header.addEventListener("click", () => {
+          const column = header.dataset.column;
+          if (!column) {
+            return;
+          }
+          toggleSort(column);
+        });
+      });
+    }
+
+    function getVisibleRows(rows) {
+      const normalizedFilter = (tableFilterInput.value || "").trim().toLowerCase();
+      let visibleRows = [...rows];
+
+      if (normalizedFilter) {
+        visibleRows = visibleRows.filter((row) =>
+          Object.values(row).some((value) =>
+            String(value ?? "").toLowerCase().includes(normalizedFilter)
+          )
+        );
+      }
+
+      if (!currentSort.column) {
+        return visibleRows;
+      }
+
+      return visibleRows.sort((left, right) => compareValues(
+        left[currentSort.column],
+        right[currentSort.column],
+        currentSort.direction
+      ));
+    }
+
+    function compareValues(left, right, direction) {
+      const fallbackLeft = left ?? "";
+      const fallbackRight = right ?? "";
+      let result = 0;
+
+      if (typeof fallbackLeft === "number" && typeof fallbackRight === "number") {
+        result = fallbackLeft - fallbackRight;
+      } else {
+        result = String(fallbackLeft).localeCompare(String(fallbackRight), "fr", {
+          numeric: true,
+          sensitivity: "base"
+        });
+      }
+
+      return direction === "asc" ? result : -result;
+    }
+
+    function toggleSort(column) {
+      if (currentSort.column === column) {
+        currentSort.direction = currentSort.direction === "asc" ? "desc" : "asc";
+      } else {
+        currentSort = { column, direction: "asc" };
+      }
+      renderTable(currentRows);
     }
 
     function detectDatasetShape(rows) {
@@ -1445,6 +1577,9 @@
     async function executeQuery() {
       const q = promptInput.value.trim();
       if (!q) {
+        answerText.textContent = "Saisis une question avant de lancer l'analyse.";
+        routeBadge.className = "badge badge-neutral";
+        routeBadge.textContent = "Question vide";
         return;
       }
 
@@ -1495,7 +1630,7 @@
         routeBadge.textContent = "Erreur";
         auditBadge.textContent = "echec";
         artifactBadge.textContent = "erreur";
-        answerText.textContent = "Erreur : " + (error.message || "Erreur inattendue.");
+        answerText.textContent = "La demande n'a pas pu etre traitee. " + (error.message || "Erreur inattendue.");
         codeBlock.textContent = "-- Erreur lors de l'execution";
         tableContainer.innerHTML = '<div class="empty-state">Erreur lors de la recuperation des donnees.</div>';
         renderStats([]);
@@ -1511,6 +1646,10 @@
 
     function resetAll() {
       promptInput.value = "";
+      tableFilterInput.value = "";
+      currentRows = [];
+      currentVisibleRows = [];
+      currentSort = { column: null, direction: "asc" };
       answerText.textContent = "Pose une question ci-dessus pour afficher une reponse claire, les sources utiles et les donnees associees.";
       codeBlock.textContent = "-- La requete generee apparaitra ici";
       tableContainer.innerHTML = '<div class="empty-state">Aucune ligne retournee pour le moment.</div>';
@@ -1527,6 +1666,12 @@
       renderStats([]);
     }
 
+    tableFilterInput.addEventListener("input", () => {
+      renderTable(currentRows);
+    });
+    exportCsvBtn.addEventListener("click", () => {
+      downloadCsv(currentVisibleRows);
+    });
     runBtn.addEventListener("click", executeQuery);
     clearBtn.addEventListener("click", resetAll);
     historyBtn.addEventListener("click", loadHistory);
