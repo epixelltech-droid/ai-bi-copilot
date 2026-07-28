@@ -39,8 +39,8 @@ def test_home_page(client):
     response = client.get("/")
 
     assert response.status_code == 200
-    assert "AI BI Copilot Demo" in response.text
-    assert "Run question" in response.text
+    assert "AI BI Copilot" in response.text
+    assert "Lancer" in response.text
 
 
 def test_chat_sql_mode(client):
@@ -83,6 +83,70 @@ def test_chat_rag_mode(client):
     assert body["answer"]
     assert any(source in body["sources"] for source in ["kpi_dictionary.md", "business_rules.md"])
     assert body["audit_id"]
+
+
+def test_history_endpoint_returns_recent_entries(client):
+    first = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires par pays ?",
+            "user_id": "history-user",
+            "source": "auto",
+        },
+    )
+    second = client.post(
+        "/api/chat",
+        json={
+            "question": "Comment calcule-t-on la marge ?",
+            "user_id": "history-user",
+            "source": "auto",
+        },
+    )
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+
+    response = client.get("/api/history/history-user")
+    body = response.json()
+
+    assert response.status_code == 200
+    assert len(body) >= 2
+    assert body[0]["user_id"] == "history-user"
+    assert "question" in body[0]
+    assert "resolved_question" in body[0]
+    assert "query_language" in body[0]
+    assert "source_count" in body[0]
+    assert "answer_preview" in body[0]
+
+
+def test_history_endpoint_shows_memory_usage(client):
+    first = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires par pays ?",
+            "user_id": "history-memory-user",
+            "source": "auto",
+        },
+    )
+    second = client.post(
+        "/api/chat",
+        json={
+            "question": "et en 2026 ?",
+            "user_id": "history-memory-user",
+            "source": "auto",
+        },
+    )
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+
+    response = client.get("/api/history/history-memory-user")
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body[0]["used_memory"] is True
+    assert body[0]["resolved_question"] != body[0]["question"]
+    assert "2026" in body[0]["resolved_question"]
 
 
 def test_chat_rag_enterprise_mode(client):
@@ -176,6 +240,122 @@ def test_chat_sql_monthly_variant_routes_to_sql(client):
     assert body["answer"]
 
 
+def test_chat_sql_follow_up_year_uses_previous_question_context(client):
+    first = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires par pays ?",
+            "user_id": "memory-user",
+            "source": "auto",
+        },
+    )
+    assert first.status_code == 200
+
+    second = client.post(
+        "/api/chat",
+        json={
+            "question": "et en 2026 ?",
+            "user_id": "memory-user",
+            "source": "auto",
+        },
+    )
+
+    body = second.json()
+
+    assert second.status_code == 200
+    assert body["route"] == "sql"
+    assert "JOIN dim_customer c" in body["artifact"]["query"]
+    assert "WHERE d.year = 2026" in body["artifact"]["query"]
+    assert body["data"]
+
+
+def test_chat_sql_follow_up_dimension_variant_uses_previous_metric(client):
+    first = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires total ?",
+            "user_id": "memory-user-2",
+            "source": "auto",
+        },
+    )
+    assert first.status_code == 200
+
+    second = client.post(
+        "/api/chat",
+        json={
+            "question": "et par mois ?",
+            "user_id": "memory-user-2",
+            "source": "auto",
+        },
+    )
+
+    body = second.json()
+
+    assert second.status_code == 200
+    assert body["route"] == "sql"
+    assert "JOIN dim_date d" in body["artifact"]["query"]
+    assert "d.month_name" in body["artifact"]["query"]
+    assert body["data"]
+
+
+def test_chat_sql_follow_up_metric_variant_uses_previous_dimension(client):
+    first = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires par pays ?",
+            "user_id": "memory-user-3",
+            "source": "auto",
+        },
+    )
+    assert first.status_code == 200
+
+    second = client.post(
+        "/api/chat",
+        json={
+            "question": "et la marge ?",
+            "user_id": "memory-user-3",
+            "source": "auto",
+        },
+    )
+
+    body = second.json()
+
+    assert second.status_code == 200
+    assert body["route"] == "sql"
+    assert "JOIN dim_customer c" in body["artifact"]["query"]
+    assert "SUM(f.margin)" in body["artifact"]["query"]
+    assert body["data"]
+
+
+def test_chat_rag_follow_up_uses_previous_documentary_context(client):
+    first = client.post(
+        "/api/chat",
+        json={
+            "question": "Que signifie Revenue ?",
+            "user_id": "memory-user-4",
+            "source": "auto",
+        },
+    )
+    assert first.status_code == 200
+
+    second = client.post(
+        "/api/chat",
+        json={
+            "question": "et la marge ?",
+            "user_id": "memory-user-4",
+            "source": "auto",
+        },
+    )
+
+    body = second.json()
+
+    assert second.status_code == 200
+    assert body["route"] == "rag"
+    assert body["artifact"]["language"] == "NONE"
+    assert body["answer"]
+    assert any(source in body["sources"] for source in ["kpi_dictionary.md", "business_rules.md"])
+
+
 def test_chat_rag_definition_variant_routes_to_rag(client):
     response = client.post(
         "/api/chat",
@@ -248,6 +428,85 @@ def test_chat_rag_smb_question_routes_to_rag(client):
     assert body["artifact"]["language"] == "NONE"
     assert "SMB" in body["answer"]
     assert "data_dictionary.md" in body["sources"]
+
+
+def test_chat_short_revenue_documentary_question_routes_to_rag(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Revenue ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "rag"
+    assert body["artifact"]["language"] == "NONE"
+    assert body["answer"]
+
+
+def test_chat_enterprise_top_customers_routes_to_sql(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quels sont les clients Enterprise les plus performants ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert body["artifact"]["query"]
+    assert "WHERE c.segment = 'Enterprise'" in body["artifact"]["query"]
+    assert body["data"]
+
+
+def test_chat_sql_revenue_by_segment_in_2026_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires par segment en 2026 ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert "JOIN dim_customer c" in body["artifact"]["query"]
+    assert "JOIN dim_date d" in body["artifact"]["query"]
+    assert "WHERE d.year = 2026" in body["artifact"]["query"]
+    assert body["data"]
+
+
+def test_chat_sql_revenue_by_month_in_2026_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires par mois en 2026 ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert body["artifact"]["language"] == "SQL"
+    assert "JOIN dim_date d" in body["artifact"]["query"]
+    assert "WHERE d.year = 2026" in body["artifact"]["query"]
+    assert body["data"]
 
 
 def test_chat_rag_top_product_question_routes_to_rag(client):

@@ -21,3 +21,21 @@ class ChatResponse(BaseModel):
     data: list[dict[str, Any]] = []
     sources: list[str] = []
     audit_id: str
+
+
+class HistoryEntry(BaseModel):
+    timestamp_epoch: float
+    audit_id: str
+    user_id: str
+    question: str
+    resolved_question: str | None = None
+    route: str
+    generated_query: str | None = None
+    query_language: str | None = None
+    status: str
+    latency_ms: int
+    row_count: int = 0
+    source_count: int = 0
+    used_memory: bool = False
+    answer_preview: str | None = None
+    error: str | None = None

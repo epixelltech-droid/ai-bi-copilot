@@ -22,7 +22,7 @@ def test_revenue_by_country_insight(monkeypatch):
     assert "Maroc" in answer
     assert "1 325 897,62" in answer
     assert "Italie" in answer
-    assert "due à" not in answer
+    assert "due a" not in answer
 
 
 def test_top_products_insight(monkeypatch):
@@ -59,7 +59,7 @@ def test_margin_by_category_insight(monkeypatch):
         {"category": "Office", "margin": 445894.28},
     ]
 
-    answer = build_insight("Quelle est la marge par catégorie ?", rows, [])
+    answer = build_insight("Quelle est la marge par categorie ?", rows, [])
 
     assert "IT" in answer
     assert "1 401 951,09" in answer
@@ -78,7 +78,7 @@ def test_margin_by_country_insight(monkeypatch):
     assert "Maroc" in answer
     assert "300 000,00" in answer
     assert "marge" in answer.lower()
-    assert "La requête a retourné" not in answer
+    assert "La requete a retourne" not in answer
 
 
 def test_margin_by_country_2026_insight(monkeypatch):
@@ -93,7 +93,8 @@ def test_margin_by_country_2026_insight(monkeypatch):
     assert "Maroc" in answer
     assert "240 494,88" in answer
     assert "marge" in answer.lower()
-    assert "La requête a retourné" not in answer
+    assert "2026" in answer
+    assert "La requete a retourne" not in answer
 
 
 def test_revenue_by_month_insight(monkeypatch):
@@ -109,7 +110,7 @@ def test_revenue_by_month_insight(monkeypatch):
     assert "May 2026" in answer
     assert "316 077,11" in answer
     assert "January 2025" in answer
-    assert "3 période(s)" in answer
+    assert "3 periode(s)" in answer
 
 
 def test_france_maroc_comparison_insight(monkeypatch):
@@ -121,7 +122,7 @@ def test_france_maroc_comparison_insight(monkeypatch):
 
     answer = build_insight("Compare le chiffre d'affaires entre la France et le Maroc.", rows, [])
 
-    assert "Maroc génère 1 325 897,62" in answer
+    assert "Maroc genere 1 325 897,62" in answer
     assert "1 117 605,15 pour France" in answer
     assert "208 292,47" in answer
 
@@ -130,7 +131,7 @@ def test_no_result_insight(monkeypatch):
     monkeypatch.setattr("app.agents.insight_agent.llm_text", lambda *args, **kwargs: None)
     answer = build_insight("Question", [], [])
 
-    assert answer == "Aucune donnée ne correspond à la requête."
+    assert answer == "Aucune donnee ne correspond a la requete."
 
 
 def test_unknown_result_shape_falls_back_safely(monkeypatch):
@@ -138,4 +139,33 @@ def test_unknown_result_shape_falls_back_safely(monkeypatch):
     rows = [{"segment": "Enterprise", "count": 12}]
     answer = build_insight("Question", rows, [])
 
-    assert answer == "La requête a retourné 1 ligne(s)."
+    assert answer == "La requete a retourne 1 ligne(s)."
+
+
+def test_margin_by_category_2026_mentions_year(monkeypatch):
+    monkeypatch.setattr("app.agents.insight_agent.llm_text", lambda *args, **kwargs: None)
+    rows = [
+        {"category": "IT", "margin": 621450.11},
+        {"category": "Office", "margin": 205112.44},
+    ]
+
+    answer = build_insight("Quelle est la marge par categorie en 2026 ?", rows, [])
+
+    assert "2026" in answer
+    assert "IT" in answer
+    assert "621 450,11" in answer
+
+
+def test_enterprise_top_customers_insight(monkeypatch):
+    monkeypatch.setattr("app.agents.insight_agent.llm_text", lambda *args, **kwargs: None)
+    rows = [
+        {"customer_name": "Summit Enterprise", "revenue": 281262.43},
+        {"customer_name": "Pulse Enterprise", "revenue": 262094.85},
+        {"customer_name": "Nova Enterprise", "revenue": 241100.12},
+    ]
+
+    answer = build_insight("Quels sont les clients Enterprise les plus performants ?", rows, [])
+
+    assert "Summit Enterprise" in answer
+    assert "281 262,43" in answer
+    assert "Le client" in answer

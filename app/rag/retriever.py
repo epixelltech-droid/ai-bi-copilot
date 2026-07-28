@@ -18,6 +18,7 @@ TOKEN_EXPANSIONS = {
     "marge": ["margin"],
     "marges": ["margin", "gross"],
     "gross": ["margin"],
+    "gross margin": ["margin"],
     "profit": ["margin"],
     "ca": ["revenue", "chiffre", "affaires"],
     "chiffre": ["revenue"],
@@ -39,6 +40,7 @@ TOKEN_EXPANSIONS = {
     "category": ["categorie"],
     "pays": ["country"],
     "country": ["pays"],
+    "segment": ["enterprise", "smb", "retail"],
     "mensuel": ["month"],
     "mois": ["month", "month_name"],
     "regle": ["rules"],
@@ -51,6 +53,14 @@ TOKEN_EXPANSIONS = {
     "meilleurs": ["top"],
     "classe": ["ranked"],
     "classement": ["ranking"],
+    "definition": ["definition", "meaning"],
+    "signifie": ["definition", "meaning"],
+    "veut": ["definition", "meaning"],
+    "dire": ["definition", "meaning"],
+    "difference": ["compare"],
+    "calcul": ["formula"],
+    "calcule": ["formula"],
+    "formule": ["formula"],
 }
 
 IMPORTANT_TOKENS = {
@@ -61,17 +71,26 @@ IMPORTANT_TOKENS = {
 
 INTENT_TOKENS = {
     "calcule", "comment", "definition", "definir", "definit", "difference",
-    "dire", "formule", "signifie", "veut",
+    "dire", "formule", "formula", "meaning", "rules", "rule", "compare",
+    "signifie", "veut",
+}
+
+SOURCE_INTENT_BOOSTS = {
+    "definition": {"kpi_dictionary.md": 4, "data_dictionary.md": 2},
+    "formula": {"kpi_dictionary.md": 4, "business_rules.md": 3},
+    "business_rule": {"business_rules.md": 4, "data_dictionary.md": 1},
+    "data_dictionary": {"data_dictionary.md": 4, "business_rules.md": 1},
 }
 
 
 def retrieve(question: str, k: int = 3) -> list[dict]:
     chunks = chunk_documents(load_markdown_documents())
     question_tokens = _expand_tokens(_tokenize(question))
+    intent = _detect_intent(question)
     scored_chunks = []
 
     for chunk in chunks:
-        score = _score_chunk(question_tokens, chunk)
+        score = _score_chunk(question_tokens, chunk, intent)
         if score > 0:
             scored_chunks.append((score, chunk))
 
@@ -93,16 +112,26 @@ def answer_from_context(question: str, chunks: list[dict]) -> dict:
         answer = _build_definition_answer(question, chunks)
     elif "difference entre" in normalized_question:
         answer = _build_difference_answer(question, chunks)
+    elif "gross margin" in normalized_question:
+        answer = _build_definition_answer(question, chunks)
     elif "top product" in normalized_question or ("top" in normalized_question and "produit" in normalized_question):
         answer = _build_business_rule_answer(chunks, "top product")
     elif "top customer" in normalized_question or ("top" in normalized_question and "client" in normalized_question):
         answer = _build_business_rule_answer(chunks, "top customer")
     elif "smb" in normalized_question:
         answer = _build_line_answer(chunks, "SMB")
+    elif "retail" in normalized_question and "client" in normalized_question:
+        answer = _build_line_answer(chunks, "Retail")
     elif "enterprise" in normalized_question and "client" in normalized_question:
         answer = _build_enterprise_answer(chunks)
+    elif "segment" in normalized_question:
+        answer = _build_segment_answer(chunks)
+    elif "categorie" in normalized_question or "category" in normalized_question:
+        answer = _build_category_answer(chunks)
     elif "pays" in normalized_question or "country" in normalized_question:
         answer = _build_country_answer(chunks)
+    elif normalized_question in {"revenue", "margin", "cost", "asp", "smb", "gross margin"}:
+        answer = _build_definition_answer(question, chunks)
     elif any(pattern in normalized_question for pattern in ["que signifie", "definition"]):
         answer = _build_definition_answer(question, chunks)
     elif any(pattern in normalized_question for pattern in ["comment calcule", "formule", "calcule t on"]):
@@ -120,7 +149,7 @@ def answer_from_context(question: str, chunks: list[dict]) -> dict:
     }
 
 
-def _score_chunk(question_tokens: set[str], chunk: dict) -> int:
+def _score_chunk(question_tokens: set[str], chunk: dict, intent: str) -> int:
     content_question_tokens = question_tokens - INTENT_TOKENS
     if not content_question_tokens:
         return 0
@@ -147,7 +176,24 @@ def _score_chunk(question_tokens: set[str], chunk: dict) -> int:
         score += 2
     if "rules" in body_tokens and "rules" in question_tokens:
         score += 2
+    source_boost = SOURCE_INTENT_BOOSTS.get(intent, {}).get(chunk["source"], 0)
+    score += source_boost
+
+    if intent == "data_dictionary" and chunk["source"] == "data_dictionary.md" and "table" in title_tokens:
+        score += 2
+
     return score
+
+
+def _detect_intent(question: str) -> str:
+    normalized = _normalize_text(question)
+    if any(pattern in normalized for pattern in ["comment calcule", "formule", "calcule t on"]):
+        return "formula"
+    if any(pattern in normalized for pattern in ["regle", "regles", "top customer", "top product"]):
+        return "business_rule"
+    if any(pattern in normalized for pattern in ["segment", "categorie", "category", "country", "pays", "client enterprise"]):
+        return "data_dictionary"
+    return "definition"
 
 
 def _expand_tokens(tokens: set[str]) -> set[str]:
@@ -256,6 +302,31 @@ def _build_enterprise_answer(chunks: list[dict]) -> str:
     return _build_line_answer(chunks, "Enterprise") or _build_generic_answer(chunks)
 
 
+def _build_segment_answer(chunks: list[dict]) -> str:
+    available = []
+    for keyword in ["Enterprise", "SMB", "Retail"]:
+        line = _build_line_answer(chunks, keyword)
+        if line and line not in available:
+            available.append(line)
+    if available:
+        return "\n\n".join(available[:3])
+    return _build_generic_answer(chunks)
+
+
+def _build_category_answer(chunks: list[dict]) -> str:
+    sentences = []
+    for chunk in chunks:
+        text = _strip_markdown(chunk["text"])
+        for sentence in _split_sentences(text):
+            normalized = _normalize_text(sentence)
+            if "category" in normalized and ("product" in normalized or "group" in normalized or "famil" in normalized):
+                if sentence not in sentences:
+                    sentences.append(sentence)
+            if len(sentences) >= 2:
+                return "\n\n".join(sentences)
+    return _build_generic_answer(chunks)
+
+
 def _build_country_answer(chunks: list[dict]) -> str:
     for chunk in chunks:
         text = _strip_markdown(chunk["text"])
@@ -336,6 +407,8 @@ def _find_best_matching_chunk(question: str, chunks: list[dict]) -> dict | None:
         return _find_chunk_by_title(chunks, "gross margin")
     if "cost" in normalized_question:
         return _find_chunk_by_title(chunks, "cost")
+    if "quantity" in normalized_question or "quantite" in normalized_question:
+        return _find_chunk_by_title(chunks, "quantity")
     if "revenue" in normalized_question:
         return _find_chunk_by_title(chunks, "revenue")
     if "margin" in normalized_question or "marge" in normalized_question:

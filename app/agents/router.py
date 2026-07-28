@@ -8,16 +8,20 @@ def normalize_question(question: str) -> str:
     return " ".join(cleaned.split())
 
 
-def route_question(question: str, preferred: str = "auto") -> str:
-    if preferred != "auto":
-        return preferred
+def contains_any(text: str, patterns: list[str]) -> bool:
+    return any(pattern in text for pattern in patterns)
 
-    q = normalize_question(question)
 
+def is_powerbi_question(normalized_question: str) -> bool:
+    return contains_any(normalized_question, ["dax", "power bi", "semantic model", "mesure"])
+
+
+def is_documentary_question(normalized_question: str) -> bool:
     documentary_patterns = [
         "definition",
         "definition de",
         "a quoi correspond",
+        "correspond a quoi",
         "que signifie",
         "que veut dire",
         "qu est ce",
@@ -32,16 +36,98 @@ def route_question(question: str, preferred: str = "auto") -> str:
         "regle metier",
         "regles metier",
         "documentation",
-        "difference entre",
-        "diff rence entre",
+    ]
+    if contains_any(normalized_question, documentary_patterns):
+        return True
+
+    if "difference entre" in normalized_question or "diff rence entre" in normalized_question:
+        analytical_entities = [
+            "france",
+            "maroc",
+            "italie",
+            "espagne",
+            "allemagne",
+            "pays",
+            "segment",
+            "categorie",
+            "category",
+            "client",
+            "customer",
+            "produit",
+            "product",
+            "2025",
+            "2026",
+        ]
+        if contains_any(normalized_question, analytical_entities):
+            return False
+        return True
+
+    documentary_short_forms = [
+        "revenue",
+        "margin",
+        "margin %",
+        "cost",
+        "asp",
+        "average selling price",
+        "smb",
         "top customer",
         "top product",
     ]
+    if normalized_question in documentary_short_forms:
+        return True
 
-    if any(pattern in q for pattern in documentary_patterns):
+    short_documentary_questions = [
+        "que signifie revenue",
+        "que signifie margin",
+        "que signifie margin %",
+        "que signifie cost",
+        "que signifie asp",
+        "que signifie smb",
+    ]
+    return normalized_question in short_documentary_questions
+
+
+def is_analytical_question(normalized_question: str) -> bool:
+    analytical_patterns = [
+        "chiffre d affaires",
+        "revenue",
+        "ca",
+        "marge",
+        "margin",
+        "par pays",
+        "par segment",
+        "par categorie",
+        "par mois",
+        "mensuel",
+        "top 5",
+        "top 10",
+        "meilleurs clients",
+        "plus performants",
+        "clients retail",
+        "clients enterprise",
+        "compare",
+        "comparaison",
+        "janvier 2026",
+        "2025",
+        "2026",
+        "total",
+    ]
+    return contains_any(normalized_question, analytical_patterns)
+
+
+def route_question(question: str, preferred: str = "auto") -> str:
+    if preferred != "auto":
+        return preferred
+
+    q = normalize_question(question)
+
+    if is_powerbi_question(q):
+        return "powerbi"
+
+    if is_documentary_question(q):
         return "rag"
 
-    if any(x in q for x in ["dax", "power bi", "semantic model", "mesure"]):
-        return "powerbi"
+    if is_analytical_question(q):
+        return "sql"
 
     return "sql"

@@ -210,3 +210,54 @@ def test_unknown_kpi_question_stays_safe():
 
     assert result["answer"] == "Je n'ai pas trouve cette information dans la base documentaire."
     assert result["sources"] == []
+
+
+def test_retrieve_gross_margin_returns_margin_chunk():
+    chunks = retrieve("Que signifie Gross Margin ?", k=3)
+
+    assert chunks
+    assert any("Gross Margin" in chunk["text"] or "Margin" in chunk["text"] for chunk in chunks)
+    assert any(chunk["source"] in {"kpi_dictionary.md", "business_rules.md"} for chunk in chunks)
+
+
+def test_answer_gross_margin_contains_formula():
+    chunks = retrieve("Que signifie Gross Margin ?", k=3)
+    result = answer_from_context("Que signifie Gross Margin ?", chunks)
+
+    assert "Gross Margin" in result["answer"] or "Margin" in result["answer"]
+    assert "Revenue - Cost" in result["answer"]
+
+
+def test_answer_cost_contains_formula():
+    chunks = retrieve("Que signifie Cost ?", k=3)
+    result = answer_from_context("Que signifie Cost ?", chunks)
+
+    assert "Cost" in result["answer"]
+    assert "Quantity x Unit Cost" in result["answer"]
+
+
+def test_answer_segment_question_returns_available_segments():
+    chunks = retrieve("Quels segments clients existent ?", k=3)
+    result = answer_from_context("Quels segments clients existent ?", chunks)
+
+    assert "Enterprise" in result["answer"]
+    assert "SMB" in result["answer"]
+    assert "Retail" in result["answer"]
+    assert "data_dictionary.md" in result["sources"]
+
+
+def test_answer_category_question_returns_category_explanation():
+    chunks = retrieve("A quoi correspond une categorie produit ?", k=3)
+    result = answer_from_context("A quoi correspond une categorie produit ?", chunks)
+
+    assert "category" in result["answer"].lower() or "categorie" in result["answer"].lower()
+    assert "product" in result["answer"].lower() or "produit" in result["answer"].lower()
+    assert "data_dictionary.md" in result["sources"]
+
+
+def test_short_cost_question_is_understood():
+    chunks = retrieve("Cost ?", k=3)
+    result = answer_from_context("Cost ?", chunks)
+
+    assert "Cost" in result["answer"]
+    assert "Quantity x Unit Cost" in result["answer"]

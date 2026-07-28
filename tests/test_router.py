@@ -47,3 +47,31 @@ def test_rag_top_product_definition_variant():
 
 def test_rag_country_meaning_variant():
     assert route_question("A quoi correspond le pays dans les analyses ?") == "rag"
+
+
+def test_short_revenue_term_routes_to_rag():
+    assert route_question("Revenue ?") == "rag"
+
+
+def test_short_margin_percent_term_routes_to_rag():
+    assert route_question("Margin %") == "rag"
+
+
+def test_compare_countries_revenue_routes_to_sql():
+    assert route_question("Compare le chiffre d'affaires entre la France et le Maroc") == "sql"
+
+
+def test_difference_between_countries_revenue_routes_to_sql():
+    assert route_question("Quelle est la difference de chiffre d'affaires entre la France et le Maroc ?") == "sql"
+
+
+def test_enterprise_top_customers_routes_to_sql():
+    assert route_question("Quels sont les clients Enterprise les plus performants ?") == "sql"
+
+
+def test_business_rules_question_routes_to_rag():
+    assert route_question("Quelles sont les regles metier de la marge ?") == "rag"
+
+
+def test_january_2026_sales_question_routes_to_sql():
+    assert route_question("Affiche les ventes de janvier 2026") == "sql"

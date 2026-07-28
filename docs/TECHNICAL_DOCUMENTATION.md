@@ -186,9 +186,15 @@ Typical audit content:
 
 - user id
 - question
+- resolved question after memory rewrite if applicable
 - selected route
 - generated query if any
+- query language
 - status
+- source count
+- row count
+- whether memory was used
+- answer preview
 - timestamp or latency data
 
 ## Tests

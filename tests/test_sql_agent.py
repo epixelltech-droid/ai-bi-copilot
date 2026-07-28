@@ -246,3 +246,104 @@ def test_margin_by_country_uses_customer_dimension(monkeypatch):
     assert rows
     assert "country" in rows[0]
     assert "margin" in rows[0]
+
+
+def test_enterprise_top_customers_filters_segment(monkeypatch):
+    query, rows = run_local_sql("Quels sont les clients Enterprise les plus performants ?", monkeypatch)
+
+    assert "JOIN dim_customer c" in query
+    assert "WHERE c.segment = 'Enterprise'" in query
+    assert "GROUP BY c.customer_name" in query
+    assert "LIMIT 10" in query
+    assert len(rows) == 10
+    assert "customer_name" in rows[0]
+    assert "revenue" in rows[0]
+
+
+def test_revenue_by_segment_in_2026_uses_segment_and_year(monkeypatch):
+    query, rows = run_local_sql("Quel est le chiffre d'affaires par segment en 2026 ?", monkeypatch)
+
+    assert "JOIN dim_customer c" in query
+    assert "JOIN dim_date d" in query
+    assert "WHERE d.year = 2026" in query
+    assert "GROUP BY c.segment" in query
+    assert rows
+    assert "segment" in rows[0]
+    assert "revenue" in rows[0]
+
+
+def test_margin_by_segment_in_2025_uses_segment_and_year(monkeypatch):
+    query, rows = run_local_sql("Quelle est la marge par segment en 2025 ?", monkeypatch)
+
+    assert "JOIN dim_customer c" in query
+    assert "JOIN dim_date d" in query
+    assert "WHERE d.year = 2025" in query
+    assert "GROUP BY c.segment" in query
+    assert rows
+    assert "segment" in rows[0]
+    assert "margin" in rows[0]
+
+
+def test_revenue_by_category_in_2026_uses_category_and_year(monkeypatch):
+    query, rows = run_local_sql("Quel est le chiffre d'affaires par categorie en 2026 ?", monkeypatch)
+
+    assert "JOIN dim_product p" in query
+    assert "JOIN dim_date d" in query
+    assert "WHERE d.year = 2026" in query
+    assert "GROUP BY p.category" in query
+    assert rows
+    assert "category" in rows[0]
+    assert "revenue" in rows[0]
+
+
+def test_margin_by_category_in_2026_uses_category_and_year(monkeypatch):
+    query, rows = run_local_sql("Quelle est la marge par categorie en 2026 ?", monkeypatch)
+
+    assert "JOIN dim_product p" in query
+    assert "JOIN dim_date d" in query
+    assert "WHERE d.year = 2026" in query
+    assert "GROUP BY p.category" in query
+    assert rows
+    assert "category" in rows[0]
+    assert "margin" in rows[0]
+
+
+def test_revenue_by_month_in_2026_uses_month_and_year(monkeypatch):
+    query, rows = run_local_sql("Quel est le chiffre d'affaires par mois en 2026 ?", monkeypatch)
+
+    assert "JOIN dim_date d" in query
+    assert "WHERE d.year = 2026" in query
+    assert "d.month_name" in query
+    assert rows
+    assert all(row["year"] == 2026 for row in rows)
+
+
+def test_top_products_by_quantity_in_2026_uses_product_and_year(monkeypatch):
+    query, rows = run_local_sql("Quel est le top 5 des produits en quantite en 2026 ?", monkeypatch)
+
+    assert "JOIN dim_product p" in query
+    assert "JOIN dim_date d" in query
+    assert "WHERE d.year = 2026" in query
+    assert "SUM(f.quantity) AS quantity" in query
+    assert "LIMIT 5" in query
+    assert len(rows) == 5
+
+
+def test_compare_margin_between_france_and_maroc_filters_countries(monkeypatch):
+    query, rows = run_local_sql("Compare la marge entre la France et le Maroc.", monkeypatch)
+
+    assert "JOIN dim_customer c" in query
+    assert "WHERE c.country IN ('France', 'Maroc')" in query
+    assert "SUM(f.margin)" in query
+    assert len(rows) == 2
+    assert {row["country"] for row in rows} == {"France", "Maroc"}
+
+
+def test_sales_for_january_2025_use_month_and_year(monkeypatch):
+    query, rows = run_local_sql("Affiche les ventes de janvier 2025", monkeypatch)
+
+    assert "JOIN dim_date d" in query
+    assert "WHERE d.year = 2025" in query
+    assert "AND d.month = 1" in query
+    assert rows
+    assert "full_date" in rows[0]

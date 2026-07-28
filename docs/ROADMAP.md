@@ -74,9 +74,19 @@ Possible deliverables:
 
 ## Phase 5 - Future Optional V2
 
-Status: optional later
+Status: active planning
 
-Possible future extensions:
+Current direction:
+
+- V2 will be built in small work lots, starting from the current local V1
+- the first V2 lot is framing and perimeter definition
+- the next implementation lot is conversation memory
+
+Detailed scope:
+
+- see [V2 Scope](C:/Users/Workspace/Documents/ai-bi-copilot-starter/ai-bi-copilot/docs/V2_SCOPE.md:1)
+
+Longer-term possible extensions:
 
 - Azure OpenAI
 - SQL Server

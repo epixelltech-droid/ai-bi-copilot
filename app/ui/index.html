@@ -8,11 +8,11 @@
     :root {
       --bg: #07111b;
       --bg-glow: rgba(49, 196, 162, 0.14);
-      --surface: rgba(10, 21, 33, 0.88);
+      --surface: rgba(10, 21, 33, 0.9);
       --surface-strong: rgba(12, 26, 40, 0.96);
       --surface-soft: rgba(17, 33, 49, 0.92);
       --border: rgba(123, 168, 196, 0.18);
-      --border-strong: rgba(123, 168, 196, 0.3);
+      --border-strong: rgba(123, 168, 196, 0.32);
       --text: #edf5fb;
       --text-muted: #9db1c2;
       --text-dim: #6d8294;
@@ -21,6 +21,10 @@
       --accent-soft: rgba(68, 213, 178, 0.14);
       --accent-border: rgba(68, 213, 178, 0.24);
       --accent-warm: #f1aa6b;
+      --sql: #83c7ff;
+      --rag: #f3bd8d;
+      --danger-soft: rgba(255, 122, 122, 0.14);
+      --danger: #ff9f9f;
       --radius: 10px;
       --font-sans: "Segoe UI", "Aptos", "Trebuchet MS", sans-serif;
       --font-mono: "Cascadia Code", "Fira Code", Consolas, monospace;
@@ -46,23 +50,23 @@
     }
 
     .shell {
-      max-width: 1320px;
+      max-width: 1380px;
       width: 100%;
       margin: 0 auto;
       padding: 20px 16px 28px;
     }
 
     .frame {
-      display: flex;
-      flex-direction: column;
+      display: grid;
       gap: 14px;
       animation: page-rise 520ms ease-out;
     }
 
     .header,
-    .copilot-composer,
+    .composer,
+    .hero,
     .panel,
-    .answer-hero {
+    .history-panel {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -105,12 +109,24 @@
       display: block;
     }
 
+    .brand-copy {
+      display: grid;
+      gap: 2px;
+    }
+
     .app-title {
       font-size: 14px;
       font-weight: 700;
       letter-spacing: 0.01em;
       color: var(--text);
       white-space: nowrap;
+    }
+
+    .app-subtitle {
+      color: var(--text-dim);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
     .header-status {
@@ -135,36 +151,69 @@
       display: inline-block;
     }
 
-    .copilot-composer {
+    .composer {
       padding: 14px;
-      display: flex;
-      flex-direction: column;
+      display: grid;
       gap: 12px;
       animation: section-rise 560ms ease-out both;
       animation-delay: 40ms;
     }
 
-    textarea.prompt-input {
+    .top-controls {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 180px;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field-label {
+      color: var(--text-dim);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    input,
+    select,
+    textarea {
       width: 100%;
-      min-height: 76px;
-      padding: 14px 16px;
       border: 1px solid var(--border);
       border-radius: var(--radius);
       background: rgba(5, 12, 20, 0.9);
       color: var(--text);
       font: inherit;
-      font-size: 15px;
-      line-height: 1.55;
-      resize: vertical;
       outline: none;
       transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
     }
 
-    textarea.prompt-input::placeholder {
+    input,
+    select {
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+
+    textarea {
+      min-height: 88px;
+      padding: 14px 16px;
+      font-size: 15px;
+      line-height: 1.55;
+      resize: vertical;
+    }
+
+    textarea::placeholder,
+    input::placeholder {
       color: var(--text-dim);
     }
 
-    textarea.prompt-input:focus {
+    input:focus,
+    select:focus,
+    textarea:focus {
       border-color: var(--border-strong);
       box-shadow: 0 0 0 4px var(--accent-soft);
       background: rgba(7, 15, 25, 0.96);
@@ -211,24 +260,14 @@
       align-items: center;
       gap: 8px;
       margin-left: auto;
-    }
-
-    .route-select {
-      padding: 9px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: rgba(5, 12, 20, 0.9);
-      color: var(--text);
-      font: inherit;
-      font-size: 12px;
-      outline: none;
-      cursor: pointer;
+      flex-wrap: wrap;
     }
 
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 7px;
       padding: 9px 14px;
       border-radius: 8px;
       font: inherit;
@@ -264,13 +303,37 @@
       color: var(--text);
     }
 
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+    }
+
     button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
       transform: none;
     }
 
-    .answer-hero {
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.95fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .main-column,
+    .side-column {
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero {
       padding: 22px;
       display: flex;
       flex-direction: column;
@@ -286,7 +349,7 @@
       animation-delay: 90ms;
     }
 
-    .answer-hero::before {
+    .hero::before {
       content: "";
       position: absolute;
       inset: 0 auto auto 0;
@@ -294,6 +357,30 @@
       height: 180px;
       background: radial-gradient(circle, rgba(241, 170, 107, 0.14) 0%, transparent 72%);
       pointer-events: none;
+    }
+
+    .editorial-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+
+    .editorial-rule {
+      width: 22px;
+      height: 1px;
+      background: rgba(241, 170, 107, 0.55);
+      display: inline-block;
     }
 
     .answer-header {
@@ -336,13 +423,13 @@
     .badge-sql {
       background: rgba(78, 173, 255, 0.12);
       border: 1px solid rgba(78, 173, 255, 0.24);
-      color: #83c7ff;
+      color: var(--sql);
     }
 
     .badge-rag {
       background: rgba(241, 170, 107, 0.12);
       border: 1px solid rgba(241, 170, 107, 0.24);
-      color: #f3bd8d;
+      color: var(--rag);
     }
 
     .badge-dax {
@@ -357,8 +444,8 @@
       color: var(--text-muted);
     }
 
-    .answer-text-hero {
-      min-height: 84px;
+    .answer-text {
+      min-height: 112px;
       max-width: 74ch;
       color: #ffffff;
       font-size: 19px;
@@ -370,9 +457,40 @@
       z-index: 1;
     }
 
-    .answer-text-hero::first-line {
+    .answer-text::first-line {
       color: #f6fbff;
       font-weight: 650;
+    }
+
+    .hero-meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .meta-card {
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .meta-label {
+      color: var(--text-dim);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .meta-value {
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.45;
+      word-break: break-word;
     }
 
     .sources-row {
@@ -410,13 +528,8 @@
       font-size: 10px;
     }
 
-    .workspace-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-
-    .panel {
+    .panel,
+    .history-panel {
       padding: 14px;
       display: flex;
       flex-direction: column;
@@ -428,7 +541,8 @@
       animation-delay: 130ms;
     }
 
-    .panel:nth-of-type(2) {
+    .panel:nth-of-type(2),
+    .history-panel {
       animation-delay: 170ms;
     }
 
@@ -449,10 +563,53 @@
       text-transform: uppercase;
     }
 
+    .panel-subtitle {
+      color: var(--text-dim);
+      font-size: 11px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat-card {
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: grid;
+      gap: 6px;
+    }
+
+    .stat-title {
+      color: var(--text-dim);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      color: var(--text);
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .stat-note {
+      color: var(--text-muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
     .code-container,
-    .table-container {
+    .table-container,
+    .viz-container,
+    .history-list {
       min-height: 230px;
-      max-height: 320px;
+      max-height: 360px;
       overflow: auto;
       border-radius: 8px;
       border: 1px solid rgba(255, 255, 255, 0.06);
@@ -523,35 +680,168 @@
       background: rgba(68, 213, 178, 0.04);
     }
 
+    .viz-container {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .viz-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .viz-row {
+      display: grid;
+      gap: 6px;
+    }
+
+    .viz-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .viz-label {
+      color: var(--text);
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .viz-value {
+      font-family: var(--font-mono);
+    }
+
+    .viz-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .viz-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent) 0%, #6bbdff 100%);
+    }
+
+    .viz-summary {
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      align-content: start;
+    }
+
+    .history-item {
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: grid;
+      gap: 10px;
+      cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+    }
+
+    .history-item:hover {
+      transform: translateY(-1px);
+      border-color: rgba(68, 213, 178, 0.2);
+      background: rgba(68, 213, 178, 0.05);
+    }
+
+    .history-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .history-route {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .history-route.sql {
+      color: var(--sql);
+      border-color: rgba(78, 173, 255, 0.24);
+      background: rgba(78, 173, 255, 0.08);
+    }
+
+    .history-route.rag {
+      color: var(--rag);
+      border-color: rgba(241, 170, 107, 0.24);
+      background: rgba(241, 170, 107, 0.08);
+    }
+
+    .history-status {
+      color: var(--text-dim);
+      font-size: 10px;
+      font-family: var(--font-mono);
+    }
+
+    .history-question {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .history-resolved {
+      color: var(--text-dim);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .history-preview {
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .history-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .history-chip {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--text-dim);
+      font-size: 10px;
+      font-family: var(--font-mono);
+    }
+
     .empty-state {
       padding: 22px;
       text-align: center;
       color: var(--text-dim);
       font-size: 12px;
-    }
-
-    .editorial-kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      width: fit-content;
-      padding: 5px 10px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      color: var(--text-muted);
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      position: relative;
-      z-index: 1;
-    }
-
-    .editorial-rule {
-      width: 22px;
-      height: 1px;
-      background: rgba(241, 170, 107, 0.55);
-      display: inline-block;
     }
 
     @keyframes page-rise {
@@ -576,15 +866,26 @@
       }
     }
 
+    @media (max-width: 1050px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .side-column {
+        order: -1;
+      }
+    }
+
     @media (max-width: 800px) {
       .shell {
         padding: 14px;
       }
 
       .header,
-      .copilot-composer,
-      .answer-hero,
-      .panel {
+      .composer,
+      .hero,
+      .panel,
+      .history-panel {
         padding-left: 12px;
         padding-right: 12px;
       }
@@ -592,6 +893,12 @@
       .header {
         align-items: flex-start;
         flex-direction: column;
+      }
+
+      .top-controls,
+      .hero-meta,
+      .stats-grid {
+        grid-template-columns: 1fr;
       }
 
       .controls-row {
@@ -602,24 +909,21 @@
         width: 100%;
         margin-left: 0;
         justify-content: flex-end;
-        flex-wrap: wrap;
       }
 
-      .answer-header {
+      .answer-header,
+      .history-top {
         align-items: flex-start;
         flex-direction: column;
-      }
-
-      .workspace-grid {
-        grid-template-columns: 1fr;
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
       .frame,
-      .copilot-composer,
-      .answer-hero,
-      .panel {
+      .composer,
+      .hero,
+      .panel,
+      .history-panel {
         animation: none;
       }
 
@@ -637,12 +941,15 @@
         <div class="brand-group">
           <div class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 6h12" />
-              <path d="M6 12h12" />
-              <path d="M6 18h8" />
+              <path d="M6 6h12"></path>
+              <path d="M6 12h12"></path>
+              <path d="M6 18h8"></path>
             </svg>
           </div>
-          <div class="app-title">AI BI Copilot</div>
+          <div class="brand-copy">
+            <div class="app-title">AI BI Copilot</div>
+            <div class="app-subtitle">V2 locale - multi-agent BI</div>
+          </div>
         </div>
         <div class="header-status">
           <span class="dot"></span>
@@ -650,79 +957,156 @@
         </div>
       </header>
 
-      <section class="copilot-composer">
-        <div class="input-wrapper">
-          <textarea id="promptInput" class="prompt-input" placeholder="Pose une question sur le chiffre d'affaires, la marge, les produits ou la documentation...">Quel est le chiffre d'affaires par pays ?</textarea>
+      <section class="composer">
+        <div class="top-controls">
+          <div class="field">
+            <label class="field-label" for="promptInput">Question</label>
+            <textarea id="promptInput" placeholder="Pose une question sur le chiffre d'affaires, la marge, les produits ou la documentation...">Quel est le chiffre d'affaires par pays ?</textarea>
+          </div>
+          <div class="field">
+            <label class="field-label" for="userIdInput">Utilisateur</label>
+            <input id="userIdInput" type="text" value="portfolio-user" />
+          </div>
         </div>
 
         <div class="controls-row">
           <div class="presets-group">
             <button class="preset-chip" data-q="Quel est le chiffre d'affaires par pays ?">CA par pays</button>
             <button class="preset-chip" data-q="Quel est le top 5 des produits en quantite ?">Top 5 produits</button>
-            <button class="preset-chip" data-q="Quelle est la marge par segment ?">Marge par segment</button>
+            <button class="preset-chip" data-q="Quelle est la marge par segment en 2026 ?">Marge segment 2026</button>
             <button class="preset-chip" data-q="Comment calcule-t-on l'ASP ?">Formule ASP</button>
-            <button class="preset-chip" data-q="Que veut dire SMB ?">Definition SMB</button>
+            <button class="preset-chip" data-q="Quels segments clients existent ?">Segments clients</button>
           </div>
 
           <div class="action-group">
-            <select id="routeSelect" class="route-select">
+            <select id="routeSelect">
               <option value="auto" selected>Routage auto</option>
               <option value="sql">SQL</option>
               <option value="rag">RAG</option>
               <option value="powerbi">DAX</option>
             </select>
+            <button id="historyBtn" class="btn btn-ghost">Historique</button>
             <button id="clearBtn" class="btn btn-secondary">Effacer</button>
             <button id="runBtn" class="btn btn-primary">Lancer</button>
           </div>
         </div>
       </section>
 
-      <section class="answer-hero">
-        <div class="editorial-kicker">
-          <span class="editorial-rule"></span>
-          <span>Lecture metier</span>
-        </div>
-        <div class="answer-header">
-          <span class="answer-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            Synthese
-          </span>
-          <div class="badges-container">
-            <span id="routeBadge" class="badge badge-neutral">En attente</span>
-            <span id="auditBadge" class="badge badge-neutral">en attente</span>
+      <div class="content-grid">
+        <div class="main-column">
+          <section class="hero">
+            <div class="editorial-kicker">
+              <span class="editorial-rule"></span>
+              <span>Lecture metier</span>
+            </div>
+
+            <div class="answer-header">
+              <span class="answer-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                Synthese
+              </span>
+              <div class="badges-container">
+                <span id="routeBadge" class="badge badge-neutral">En attente</span>
+                <span id="auditBadge" class="badge badge-neutral">en attente</span>
+              </div>
+            </div>
+
+            <div id="answerText" class="answer-text">Pose une question ci-dessus pour afficher une reponse claire, les sources utiles et les donnees associees.</div>
+
+            <div class="hero-meta">
+              <div class="meta-card">
+                <div class="meta-label">Question resolue</div>
+                <div id="resolvedQuestionValue" class="meta-value">Aucune reformulation pour le moment.</div>
+              </div>
+              <div class="meta-card">
+                <div class="meta-label">Route et requete</div>
+                <div id="routeMetaValue" class="meta-value">Le moteur choisira automatiquement la meilleure voie.</div>
+              </div>
+              <div class="meta-card">
+                <div class="meta-label">Volume retourne</div>
+                <div id="dataMetaValue" class="meta-value">Aucune ligne retournee pour le moment.</div>
+              </div>
+            </div>
+
+            <div id="sourcesRow" class="sources-row" style="display: none;">
+              <span class="sources-label">Sources</span>
+              <div id="sourcesContainer" class="sources-list"></div>
+            </div>
+          </section>
+
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Requete generee</span>
+              <span id="artifactBadge" class="badge badge-neutral">en attente</span>
+            </div>
+            <div class="code-container">
+              <button id="copyCodeBtn" class="copy-btn">Copier</button>
+              <pre id="codeBlock" class="code-block">-- La requete generee apparaitra ici</pre>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <span class="panel-title">Repere rapide</span>
+                <div class="panel-subtitle">Un resume numerique pour lire plus vite le resultat</div>
+              </div>
+            </div>
+            <div id="statsGrid" class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-title">Indicateur</div>
+                <div id="statMetric" class="stat-value">En attente</div>
+                <div id="statMetricNote" class="stat-note">Le principal indicateur apparaitra ici.</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-title">Leader</div>
+                <div id="statLeader" class="stat-value">En attente</div>
+                <div id="statLeaderNote" class="stat-note">La meilleure valeur sera mise en avant quand c'est possible.</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-title">Lecture</div>
+                <div id="statReading" class="stat-value">Aucune</div>
+                <div id="statReadingNote" class="stat-note">Comparaison, classement ou total selon le resultat.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Donnees retournees</span>
+              <span id="rowCountBadge" class="badge badge-neutral">0 ligne</span>
+            </div>
+            <div id="tableContainer" class="table-container">
+              <div class="empty-state">Aucune ligne retournee pour le moment.</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <span class="panel-title">Lecture visuelle</span>
+                <div class="panel-subtitle">Une vue barres simple quand le resultat s'y prete</div>
+              </div>
+            </div>
+            <div id="vizContainer" class="viz-container">
+              <div class="empty-state">Aucune visualisation disponible pour le moment.</div>
+            </div>
           </div>
         </div>
 
-        <div id="answerText" class="answer-text-hero">
-          Pose une question ci-dessus pour afficher une reponse claire, les sources utiles et les donnees associees.
-        </div>
-
-        <div id="sourcesRow" class="sources-row" style="display: none;">
-          <span class="sources-label">Sources</span>
-          <div id="sourcesContainer" class="sources-list"></div>
-        </div>
-      </section>
-
-      <div class="workspace-grid">
-        <div class="panel">
-          <div class="panel-header">
-            <span class="panel-title">Requete generee</span>
-            <span id="artifactBadge" class="badge badge-neutral">en attente</span>
-          </div>
-          <div class="code-container">
-            <button id="copyCodeBtn" class="copy-btn">Copier</button>
-            <pre id="codeBlock" class="code-block">-- La requete generee apparaitra ici</pre>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-header">
-            <span class="panel-title">Donnees retournees</span>
-            <span id="rowCountBadge" class="badge badge-neutral">0 ligne</span>
-          </div>
-          <div id="tableContainer" class="table-container">
-            <div class="empty-state">Aucune ligne retournee pour le moment.</div>
-          </div>
+        <div class="side-column">
+          <aside class="history-panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Historique local</div>
+                <div class="panel-subtitle">Questions recentes pour l'utilisateur courant</div>
+              </div>
+              <button id="refreshHistoryBtn" class="btn btn-ghost">Actualiser</button>
+            </div>
+            <div id="historyList" class="history-list">
+              <div class="empty-state">Aucune interaction enregistree pour le moment.</div>
+            </div>
+          </aside>
         </div>
       </div>
     </div>
@@ -730,9 +1114,12 @@
 
   <script>
     const promptInput = document.getElementById("promptInput");
+    const userIdInput = document.getElementById("userIdInput");
     const routeSelect = document.getElementById("routeSelect");
     const runBtn = document.getElementById("runBtn");
     const clearBtn = document.getElementById("clearBtn");
+    const historyBtn = document.getElementById("historyBtn");
+    const refreshHistoryBtn = document.getElementById("refreshHistoryBtn");
     const answerText = document.getElementById("answerText");
     const routeBadge = document.getElementById("routeBadge");
     const auditBadge = document.getElementById("auditBadge");
@@ -743,6 +1130,39 @@
     const codeBlock = document.getElementById("codeBlock");
     const tableContainer = document.getElementById("tableContainer");
     const copyCodeBtn = document.getElementById("copyCodeBtn");
+    const historyList = document.getElementById("historyList");
+    const resolvedQuestionValue = document.getElementById("resolvedQuestionValue");
+    const routeMetaValue = document.getElementById("routeMetaValue");
+    const dataMetaValue = document.getElementById("dataMetaValue");
+    const statMetric = document.getElementById("statMetric");
+    const statMetricNote = document.getElementById("statMetricNote");
+    const statLeader = document.getElementById("statLeader");
+    const statLeaderNote = document.getElementById("statLeaderNote");
+    const statReading = document.getElementById("statReading");
+    const statReadingNote = document.getElementById("statReadingNote");
+    const vizContainer = document.getElementById("vizContainer");
+
+    function currentUserId() {
+      return (userIdInput.value || "").trim() || "portfolio-user";
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function formatNumber(value) {
+      if (typeof value !== "number" || Number.isNaN(value)) {
+        return String(value ?? "");
+      }
+      return new Intl.NumberFormat("fr-FR", {
+        maximumFractionDigits: 2
+      }).format(value);
+    }
 
     function updateRouteBadge(route) {
       routeBadge.className = "badge";
@@ -769,7 +1189,7 @@
       }
       sourcesRow.style.display = "flex";
       sourcesContainer.innerHTML = sources
-        .map(s => `<span class="source-tag">${s}</span>`)
+        .map((source) => `<span class="source-tag">${escapeHtml(source)}</span>`)
         .join("");
     }
 
@@ -782,9 +1202,11 @@
 
       rowCountBadge.textContent = `${rows.length} ligne${rows.length > 1 ? "s" : ""}`;
       const columns = Object.keys(rows[0]);
-      const ths = columns.map(c => `<th>${c}</th>`).join("");
-      const trs = rows.map(r => {
-        const tds = columns.map(c => `<td>${r[c] !== null && r[c] !== undefined ? r[c] : ""}</td>`).join("");
+      const ths = columns.map((column) => `<th>${escapeHtml(column)}</th>`).join("");
+      const trs = rows.map((row) => {
+        const tds = columns
+          .map((column) => `<td>${escapeHtml(row[column] !== null && row[column] !== undefined ? row[column] : "")}</td>`)
+          .join("");
         return `<tr>${tds}</tr>`;
       }).join("");
 
@@ -796,29 +1218,261 @@
       `;
     }
 
+    function detectDatasetShape(rows) {
+      if (!rows || rows.length === 0) {
+        return null;
+      }
+
+      const columns = Object.keys(rows[0]);
+      const numericColumns = columns.filter((column) =>
+        rows.every((row) => typeof row[column] === "number" && Number.isFinite(row[column]))
+      );
+      const labelColumns = columns.filter((column) =>
+        rows.every((row) => typeof row[column] === "string" || row[column] === null)
+      );
+
+      if (numericColumns.length === 1 && labelColumns.length >= 1) {
+        return {
+          metricColumn: numericColumns[0],
+          labelColumn: labelColumns[0]
+        };
+      }
+
+      if (numericColumns.length === 1 && rows.length === 1) {
+        return {
+          metricColumn: numericColumns[0],
+          labelColumn: null
+        };
+      }
+
+      return null;
+    }
+
+    function renderStats(rows) {
+      const shape = detectDatasetShape(rows);
+      if (!shape) {
+        statMetric.textContent = rows && rows.length ? "Resultat" : "En attente";
+        statMetricNote.textContent = rows && rows.length
+          ? "Le format retourne n'a pas de lecture rapide standard."
+          : "Le principal indicateur apparaitra ici.";
+        statLeader.textContent = rows && rows.length ? `${rows.length} ligne${rows.length > 1 ? "s" : ""}` : "En attente";
+        statLeaderNote.textContent = rows && rows.length
+          ? "Les donnees sont bien retournees mais sans leader detecte automatiquement."
+          : "La meilleure valeur sera mise en avant quand c'est possible.";
+        statReading.textContent = rows && rows.length ? "Generique" : "Aucune";
+        statReadingNote.textContent = rows && rows.length
+          ? "Lecture simple sans interpretation supplementaire."
+          : "Comparaison, classement ou total selon le resultat.";
+        return;
+      }
+
+      const metricName = shape.metricColumn;
+      statMetric.textContent = metricName.toUpperCase();
+      statMetricNote.textContent = shape.labelColumn
+        ? `Lecture basee sur ${shape.labelColumn}.`
+        : "Valeur agregee unique.";
+
+      if (!shape.labelColumn) {
+        const value = rows[0][shape.metricColumn];
+        statLeader.textContent = formatNumber(value);
+        statLeaderNote.textContent = "Valeur principale retournee par la requete.";
+        statReading.textContent = "KPI";
+        statReadingNote.textContent = "Lecture directe d'un indicateur unique.";
+        return;
+      }
+
+      const sortedRows = [...rows].sort((left, right) => (right[shape.metricColumn] || 0) - (left[shape.metricColumn] || 0));
+      const topRow = sortedRows[0];
+      const secondRow = sortedRows[1];
+
+      statLeader.textContent = topRow[shape.labelColumn] || "n/a";
+      statLeaderNote.textContent = `${formatNumber(topRow[shape.metricColumn])}${secondRow ? `, devant ${secondRow[shape.labelColumn]}.` : "."}`;
+      statReading.textContent = rows.length > 1 ? "Classement" : "Detail";
+      statReadingNote.textContent = rows.length > 1
+        ? `${rows.length} elements compares sur ${metricName}.`
+        : "Une seule ligne disponible dans le resultat.";
+    }
+
+    function renderVisualization(rows) {
+      const shape = detectDatasetShape(rows);
+      if (!shape || !shape.labelColumn) {
+        vizContainer.innerHTML = '<div class="empty-state">Aucune visualisation disponible pour ce format de resultat.</div>';
+        return;
+      }
+
+      const topRows = [...rows]
+        .sort((left, right) => (right[shape.metricColumn] || 0) - (left[shape.metricColumn] || 0))
+        .slice(0, 8);
+
+      const maxValue = Math.max(...topRows.map((row) => row[shape.metricColumn] || 0), 0);
+      if (maxValue <= 0) {
+        vizContainer.innerHTML = '<div class="empty-state">Les valeurs retournees ne permettent pas de construire une vue comparative.</div>';
+        return;
+      }
+
+      const bars = topRows.map((row) => {
+        const label = escapeHtml(row[shape.labelColumn] || "n/a");
+        const value = row[shape.metricColumn] || 0;
+        const ratio = Math.max(6, Math.round((value / maxValue) * 100));
+        return `
+          <div class="viz-row">
+            <div class="viz-meta">
+              <span class="viz-label">${label}</span>
+              <span class="viz-value">${escapeHtml(formatNumber(value))}</span>
+            </div>
+            <div class="viz-track">
+              <div class="viz-fill" style="width: ${ratio}%"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      vizContainer.innerHTML = `
+        <div class="viz-list">${bars}</div>
+        <div class="viz-summary">
+          Affichage des ${topRows.length} premieres lignes selon <strong>${escapeHtml(shape.metricColumn)}</strong>.
+        </div>
+      `;
+    }
+
+    function updateMeta(data) {
+      resolvedQuestionValue.textContent = data.resolved_question || data.question || "Aucune reformulation pour le moment.";
+      routeMetaValue.textContent = `${data.route.toUpperCase()} - ${data.artifact.language}${data.sources.length ? " - sources documentaires" : ""}`;
+      if (data.data && data.data.length > 0) {
+        dataMetaValue.textContent = `${data.data.length} ligne${data.data.length > 1 ? "s" : ""} retournee${data.data.length > 1 ? "s" : ""}.`;
+      } else if (data.sources && data.sources.length > 0) {
+        dataMetaValue.textContent = `${data.sources.length} source${data.sources.length > 1 ? "s" : ""} documentaire${data.sources.length > 1 ? "s" : ""}.`;
+      } else {
+        dataMetaValue.textContent = "Aucune ligne retournee pour cette reponse.";
+      }
+    }
+
+    function formatRoute(route) {
+      if (route === "sql") return "SQL";
+      if (route === "rag") return "RAG";
+      if (route === "powerbi") return "DAX";
+      return (route || "auto").toUpperCase();
+    }
+
+    function formatLatency(latency) {
+      if (latency === null || latency === undefined) {
+        return "n/a";
+      }
+      return `${latency} ms`;
+    }
+
+    function formatHistoryTime(entry) {
+      if (!entry.timestamp_epoch) {
+        return "n/a";
+      }
+      const date = new Date(entry.timestamp_epoch * 1000);
+      return date.toLocaleString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function renderHistory(entries) {
+      if (!entries || entries.length === 0) {
+        historyList.innerHTML = '<div class="empty-state">Aucune interaction enregistree pour le moment.</div>';
+        return;
+      }
+
+      historyList.innerHTML = entries.map((entry, index) => {
+        const routeClass = entry.route === "sql" ? "sql" : entry.route === "rag" ? "rag" : "";
+        const memoryText = entry.used_memory ? "memoire activee" : "memoire inactive";
+        const resolved = entry.resolved_question && entry.resolved_question !== entry.question
+          ? `<div class="history-resolved">Question resolue : ${escapeHtml(entry.resolved_question)}</div>`
+          : "";
+        const preview = entry.answer_preview
+          ? `<div class="history-preview">${escapeHtml(entry.answer_preview)}</div>`
+          : "";
+
+        return `
+          <article class="history-item" data-history-index="${index}">
+            <div class="history-top">
+              <span class="history-route ${routeClass}">${formatRoute(entry.route)}</span>
+              <span class="history-status">${formatHistoryTime(entry)} - ${entry.status}</span>
+            </div>
+            <div class="history-question">${escapeHtml(entry.question)}</div>
+            ${resolved}
+            ${preview}
+            <div class="history-meta">
+              <span class="history-chip">${entry.query_language || "NONE"}</span>
+              <span class="history-chip">${entry.row_count || 0} ligne${entry.row_count > 1 ? "s" : ""}</span>
+              <span class="history-chip">${entry.source_count || 0} source${entry.source_count > 1 ? "s" : ""}</span>
+              <span class="history-chip">${formatLatency(entry.latency_ms)}</span>
+              <span class="history-chip">${memoryText}</span>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      historyList.querySelectorAll(".history-item").forEach((item) => {
+        item.addEventListener("click", () => {
+          const index = Number(item.dataset.historyIndex);
+          const entry = entries[index];
+          if (!entry) {
+            return;
+          }
+          promptInput.value = entry.question || "";
+          routeSelect.value = entry.route === "sql" || entry.route === "rag" || entry.route === "powerbi"
+            ? entry.route
+            : "auto";
+          promptInput.focus();
+        });
+      });
+    }
+
+    async function loadHistory() {
+      const userId = currentUserId();
+      historyList.innerHTML = '<div class="empty-state">Chargement de l'historique...</div>';
+
+      try {
+        const response = await fetch(`/api/history/${encodeURIComponent(userId)}?limit=12`);
+        const body = await response.json();
+        if (!response.ok) {
+          throw new Error("Impossible de charger l'historique.");
+        }
+        renderHistory(body);
+      } catch (error) {
+        historyList.innerHTML = `<div class="empty-state">${escapeHtml(error.message || "Erreur de chargement.")}</div>`;
+      }
+    }
+
     async function executeQuery() {
       const q = promptInput.value.trim();
-      if (!q) return;
+      if (!q) {
+        return;
+      }
 
       runBtn.disabled = true;
       runBtn.textContent = "Chargement...";
       answerText.textContent = "Analyse de la demande en cours...";
       codeBlock.textContent = "-- Generation de la requete en cours...";
       tableContainer.innerHTML = '<div class="empty-state">Chargement des donnees...</div>';
+      vizContainer.innerHTML = '<div class="empty-state">Preparation de la lecture visuelle...</div>';
+      resolvedQuestionValue.textContent = "Resolution de la question en cours...";
+      routeMetaValue.textContent = "Selection de la meilleure route...";
+      dataMetaValue.textContent = "Preparation des resultats...";
 
       try {
-        const res = await fetch("/api/chat", {
+        const response = await fetch("/api/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             question: q,
             source: routeSelect.value,
-            user_id: "portfolio-user"
+            user_id: currentUserId()
           })
         });
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || "La requete a echoue");
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail || "La requete a echoue");
+        }
 
         updateRouteBadge(data.route);
         auditBadge.textContent = `${data.audit_id ? data.audit_id.substring(0, 8) : "ok"}`;
@@ -828,12 +1482,27 @@
         codeBlock.textContent = data.artifact.query || "-- Aucune requete generee pour cette route";
         renderSources(data.sources);
         renderTable(data.data);
-      } catch (err) {
+        renderStats(data.data);
+        renderVisualization(data.data);
+        updateMeta({
+          ...data,
+          question: q,
+          resolved_question: q
+        });
+        await loadHistory();
+      } catch (error) {
         routeBadge.className = "badge badge-neutral";
         routeBadge.textContent = "Erreur";
-        answerText.textContent = "Erreur : " + err.message;
+        auditBadge.textContent = "echec";
+        artifactBadge.textContent = "erreur";
+        answerText.textContent = "Erreur : " + (error.message || "Erreur inattendue.");
         codeBlock.textContent = "-- Erreur lors de l'execution";
         tableContainer.innerHTML = '<div class="empty-state">Erreur lors de la recuperation des donnees.</div>';
+        renderStats([]);
+        renderVisualization([]);
+        resolvedQuestionValue.textContent = "Impossible de resoudre la demande.";
+        routeMetaValue.textContent = "Le traitement a echoue.";
+        dataMetaValue.textContent = "Aucun resultat exploitable.";
       } finally {
         runBtn.disabled = false;
         runBtn.textContent = "Lancer";
@@ -845,18 +1514,26 @@
       answerText.textContent = "Pose une question ci-dessus pour afficher une reponse claire, les sources utiles et les donnees associees.";
       codeBlock.textContent = "-- La requete generee apparaitra ici";
       tableContainer.innerHTML = '<div class="empty-state">Aucune ligne retournee pour le moment.</div>';
+      vizContainer.innerHTML = '<div class="empty-state">Aucune visualisation disponible pour le moment.</div>';
       sourcesRow.style.display = "none";
       routeBadge.className = "badge badge-neutral";
       routeBadge.textContent = "En attente";
       auditBadge.textContent = "en attente";
       artifactBadge.textContent = "en attente";
       rowCountBadge.textContent = "0 ligne";
+      resolvedQuestionValue.textContent = "Aucune reformulation pour le moment.";
+      routeMetaValue.textContent = "Le moteur choisira automatiquement la meilleure voie.";
+      dataMetaValue.textContent = "Aucune ligne retournee pour le moment.";
+      renderStats([]);
     }
 
     runBtn.addEventListener("click", executeQuery);
     clearBtn.addEventListener("click", resetAll);
+    historyBtn.addEventListener("click", loadHistory);
+    refreshHistoryBtn.addEventListener("click", loadHistory);
+    userIdInput.addEventListener("change", loadHistory);
 
-    document.querySelectorAll(".preset-chip").forEach(chip => {
+    document.querySelectorAll(".preset-chip").forEach((chip) => {
       chip.addEventListener("click", () => {
         promptInput.value = chip.dataset.q;
         executeQuery();
@@ -866,10 +1543,13 @@
     copyCodeBtn.addEventListener("click", () => {
       navigator.clipboard.writeText(codeBlock.textContent);
       copyCodeBtn.textContent = "Copie";
-      setTimeout(() => { copyCodeBtn.textContent = "Copier"; }, 1500);
+      setTimeout(() => {
+        copyCodeBtn.textContent = "Copier";
+      }, 1500);
     });
 
-    executeQuery();
+    resetAll();
+    loadHistory();
   </script>
 </body>
 </html>
