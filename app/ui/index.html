@@ -983,7 +983,7 @@
               <option value="auto" selected>Routage auto</option>
               <option value="sql">SQL</option>
               <option value="rag">RAG</option>
-              <option value="powerbi">DAX</option>
+              <option value="powerbi" disabled>DAX - bientot</option>
             </select>
             <button id="historyBtn" class="btn btn-ghost">Historique</button>
             <button id="clearBtn" class="btn btn-secondary">Effacer</button>
@@ -1418,7 +1418,7 @@
             return;
           }
           promptInput.value = entry.question || "";
-          routeSelect.value = entry.route === "sql" || entry.route === "rag" || entry.route === "powerbi"
+          routeSelect.value = entry.route === "sql" || entry.route === "rag"
             ? entry.route
             : "auto";
           promptInput.focus();
@@ -1428,7 +1428,7 @@
 
     async function loadHistory() {
       const userId = currentUserId();
-      historyList.innerHTML = '<div class="empty-state">Chargement de l'historique...</div>';
+      historyList.innerHTML = "<div class=\"empty-state\">Chargement de l'historique...</div>";
 
       try {
         const response = await fetch(`/api/history/${encodeURIComponent(userId)}?limit=12`);
@@ -1540,9 +1540,13 @@
       });
     });
 
-    copyCodeBtn.addEventListener("click", () => {
-      navigator.clipboard.writeText(codeBlock.textContent);
-      copyCodeBtn.textContent = "Copie";
+    copyCodeBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(codeBlock.textContent);
+        copyCodeBtn.textContent = "Copie";
+      } catch (error) {
+        copyCodeBtn.textContent = "Indisponible";
+      }
       setTimeout(() => {
         copyCodeBtn.textContent = "Copier";
       }, 1500);
