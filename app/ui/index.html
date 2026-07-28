@@ -54,12 +54,12 @@
       max-width: 1380px;
       width: 100%;
       margin: 0 auto;
-      padding: 20px 16px 28px;
+      padding: 16px 14px 22px;
     }
 
     .frame {
       display: grid;
-      gap: 14px;
+      gap: 12px;
       animation: page-rise 520ms ease-out;
     }
 
@@ -80,7 +80,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      padding: 10px 14px;
+      padding: 8px 12px;
     }
 
     .brand-group {
@@ -112,7 +112,7 @@
 
     .brand-copy {
       display: grid;
-      gap: 2px;
+      gap: 0;
     }
 
     .app-title {
@@ -124,10 +124,7 @@
     }
 
     .app-subtitle {
-      color: var(--text-dim);
-      font-size: 11px;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      display: none;
     }
 
     .header-status {
@@ -153,9 +150,9 @@
     }
 
     .composer {
-      padding: 14px;
+      padding: 12px;
       display: grid;
-      gap: 12px;
+      gap: 10px;
       animation: section-rise 560ms ease-out both;
       animation-delay: 40ms;
     }
@@ -223,9 +220,9 @@
     .controls-row {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
 
     .presets-group {
@@ -236,7 +233,7 @@
     }
 
     .preset-chip {
-      padding: 7px 11px;
+      padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid rgba(255, 255, 255, 0.08);
       background: rgba(255, 255, 255, 0.03);
@@ -259,7 +256,7 @@
     .action-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       margin-left: auto;
       flex-wrap: wrap;
     }
@@ -335,10 +332,10 @@
     }
 
     .hero {
-      padding: 22px;
+      padding: 16px 18px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       background:
         radial-gradient(circle at top right, rgba(68, 213, 178, 0.12), transparent 26%),
         linear-gradient(180deg, rgba(14, 31, 45, 0.98) 0%, rgba(9, 20, 33, 0.98) 100%);
@@ -358,30 +355,6 @@
       height: 180px;
       background: radial-gradient(circle, rgba(241, 170, 107, 0.14) 0%, transparent 72%);
       pointer-events: none;
-    }
-
-    .editorial-kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      width: fit-content;
-      padding: 5px 10px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      color: var(--text-muted);
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      position: relative;
-      z-index: 1;
-    }
-
-    .editorial-rule {
-      width: 22px;
-      height: 1px;
-      background: rgba(241, 170, 107, 0.55);
-      display: inline-block;
     }
 
     .answer-header {
@@ -446,12 +419,12 @@
     }
 
     .answer-text {
-      min-height: 112px;
-      max-width: 74ch;
+      min-height: 88px;
+      max-width: 72ch;
       color: #ffffff;
-      font-size: 19px;
+      font-size: 18px;
       font-weight: 500;
-      line-height: 1.72;
+      line-height: 1.62;
       letter-spacing: -0.01em;
       white-space: pre-line;
       position: relative;
@@ -464,33 +437,35 @@
     }
 
     .hero-meta {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
       position: relative;
       z-index: 1;
     }
 
     .meta-card {
-      padding: 12px;
+      flex: 1 1 210px;
+      padding: 10px 11px;
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.06);
+      min-width: 0;
     }
 
     .meta-label {
       color: var(--text-dim);
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .meta-value {
       color: var(--text);
-      font-size: 12px;
-      line-height: 1.45;
+      font-size: 11px;
+      line-height: 1.4;
       word-break: break-word;
     }
 
@@ -531,10 +506,10 @@
 
     .panel,
     .history-panel {
-      padding: 14px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       animation: section-rise 660ms ease-out both;
     }
 
@@ -552,7 +527,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
-      padding-bottom: 8px;
+      padding-bottom: 6px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.07);
     }
 
@@ -566,7 +541,7 @@
 
     .panel-subtitle {
       color: var(--text-dim);
-      font-size: 11px;
+      font-size: 10px;
     }
 
     .panel-tools {
@@ -577,27 +552,27 @@
     }
 
     .panel-tools input {
-      min-width: 180px;
+      min-width: 150px;
     }
 
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
+      gap: 8px;
     }
 
     .stat-card {
-      padding: 12px;
+      padding: 10px;
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.06);
       display: grid;
-      gap: 6px;
+      gap: 4px;
     }
 
     .stat-title {
       color: var(--text-dim);
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -605,23 +580,23 @@
 
     .stat-value {
       color: var(--text);
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       line-height: 1.3;
     }
 
     .stat-note {
       color: var(--text-muted);
-      font-size: 11px;
-      line-height: 1.45;
+      font-size: 10px;
+      line-height: 1.4;
     }
 
     .code-container,
     .table-container,
     .viz-container,
     .history-list {
-      min-height: 230px;
-      max-height: 360px;
+      min-height: 200px;
+      max-height: 320px;
       overflow: auto;
       border-radius: 8px;
       border: 1px solid rgba(255, 255, 255, 0.06);
@@ -634,7 +609,7 @@
     }
 
     .code-block {
-      padding-right: 50px;
+      padding-right: 44px;
       color: #d5e2ed;
       font-family: var(--font-mono);
       font-size: 11px;
@@ -671,7 +646,7 @@
     .data-table th {
       position: sticky;
       top: 0;
-      padding: 9px 12px;
+      padding: 8px 10px;
       background: #122131;
       color: var(--text-muted);
       font-size: 9px;
@@ -684,7 +659,7 @@
     }
 
     .data-table td {
-      padding: 10px 12px;
+      padding: 9px 10px;
       color: var(--text);
       white-space: nowrap;
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -706,9 +681,9 @@
     }
 
     .viz-container {
-      padding: 14px;
+      padding: 12px;
       display: grid;
-      gap: 12px;
+      gap: 10px;
       align-content: start;
     }
 
@@ -772,18 +747,18 @@
 
     .history-list {
       display: grid;
-      gap: 10px;
+      gap: 8px;
       padding: 12px;
       align-content: start;
     }
 
     .history-item {
-      padding: 12px;
+      padding: 10px;
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.05);
       display: grid;
-      gap: 10px;
+      gap: 8px;
       cursor: pointer;
       transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
     }
@@ -834,21 +809,21 @@
 
     .history-question {
       color: var(--text);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
-      line-height: 1.5;
+      line-height: 1.4;
     }
 
     .history-resolved {
       color: var(--text-dim);
-      font-size: 11px;
-      line-height: 1.45;
+      font-size: 10px;
+      line-height: 1.4;
     }
 
     .history-preview {
       color: var(--text-muted);
-      font-size: 12px;
-      line-height: 1.5;
+      font-size: 11px;
+      line-height: 1.4;
     }
 
     .history-meta {
@@ -868,7 +843,7 @@
     }
 
     .empty-state {
-      padding: 22px;
+      padding: 18px;
       text-align: center;
       color: var(--text-dim);
       font-size: 12px;
@@ -978,12 +953,11 @@
           </div>
           <div class="brand-copy">
             <div class="app-title">AI BI Copilot</div>
-            <div class="app-subtitle">V2 locale - multi-agent BI</div>
           </div>
         </div>
         <div class="header-status">
           <span class="dot"></span>
-          <span>Moteur actif</span>
+          <span>Local</span>
         </div>
       </header>
 
@@ -1003,14 +977,12 @@
           <div class="presets-group">
             <button class="preset-chip" data-q="Quel est le chiffre d'affaires par pays ?">CA par pays</button>
             <button class="preset-chip" data-q="Quel est le top 5 des produits en quantite ?">Top 5 produits</button>
-            <button class="preset-chip" data-q="Quelle est la marge par segment en 2026 ?">Marge segment 2026</button>
             <button class="preset-chip" data-q="Comment calcule-t-on l'ASP ?">Formule ASP</button>
-            <button class="preset-chip" data-q="Quels segments clients existent ?">Segments clients</button>
           </div>
 
           <div class="action-group">
             <select id="routeSelect">
-              <option value="auto" selected>Routage auto</option>
+              <option value="auto" selected>Auto</option>
               <option value="sql">SQL</option>
               <option value="rag">RAG</option>
               <option value="powerbi" disabled>DAX - bientot</option>
@@ -1025,15 +997,10 @@
       <div class="content-grid">
         <div class="main-column">
           <section class="hero">
-            <div class="editorial-kicker">
-              <span class="editorial-rule"></span>
-              <span>Lecture metier</span>
-            </div>
-
             <div class="answer-header">
               <span class="answer-title">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-                Synthese
+                Reponse
               </span>
               <div class="badges-container">
                 <span id="routeBadge" class="badge badge-neutral">En attente</span>
@@ -1041,20 +1008,20 @@
               </div>
             </div>
 
-            <div id="answerText" class="answer-text">Pose une question ci-dessus pour afficher une reponse claire, les sources utiles et les donnees associees.</div>
+            <div id="answerText" class="answer-text">Pose une question pour afficher une reponse claire et les donnees associees.</div>
 
             <div class="hero-meta">
               <div class="meta-card">
-                <div class="meta-label">Question resolue</div>
-                <div id="resolvedQuestionValue" class="meta-value">Aucune reformulation pour le moment.</div>
+                <div class="meta-label">Question</div>
+                <div id="resolvedQuestionValue" class="meta-value">Aucune reformulation.</div>
               </div>
               <div class="meta-card">
-                <div class="meta-label">Route et requete</div>
-                <div id="routeMetaValue" class="meta-value">Le moteur choisira automatiquement la meilleure voie.</div>
+                <div class="meta-label">Route</div>
+                <div id="routeMetaValue" class="meta-value">Choix automatique.</div>
               </div>
               <div class="meta-card">
-                <div class="meta-label">Volume retourne</div>
-                <div id="dataMetaValue" class="meta-value">Aucune ligne retournee pour le moment.</div>
+                <div class="meta-label">Volume</div>
+                <div id="dataMetaValue" class="meta-value">Aucune ligne.</div>
               </div>
             </div>
 
@@ -1066,7 +1033,7 @@
 
           <div class="panel">
             <div class="panel-header">
-              <span class="panel-title">Requete generee</span>
+              <span class="panel-title">SQL</span>
               <span id="artifactBadge" class="badge badge-neutral">en attente</span>
             </div>
             <div class="code-container">
@@ -1078,25 +1045,25 @@
           <div class="panel">
             <div class="panel-header">
               <div>
-                <span class="panel-title">Repere rapide</span>
-                <div class="panel-subtitle">Un resume numerique pour lire plus vite le resultat</div>
+                <span class="panel-title">Lecture rapide</span>
+                <div class="panel-subtitle">Résumé court du résultat</div>
               </div>
             </div>
             <div id="statsGrid" class="stats-grid">
               <div class="stat-card">
                 <div class="stat-title">Indicateur</div>
                 <div id="statMetric" class="stat-value">En attente</div>
-                <div id="statMetricNote" class="stat-note">Le principal indicateur apparaitra ici.</div>
+                <div id="statMetricNote" class="stat-note">Indicateur principal.</div>
               </div>
               <div class="stat-card">
                 <div class="stat-title">Leader</div>
                 <div id="statLeader" class="stat-value">En attente</div>
-                <div id="statLeaderNote" class="stat-note">La meilleure valeur sera mise en avant quand c'est possible.</div>
+                <div id="statLeaderNote" class="stat-note">Valeur tete.</div>
               </div>
               <div class="stat-card">
                 <div class="stat-title">Lecture</div>
                 <div id="statReading" class="stat-value">Aucune</div>
-                <div id="statReadingNote" class="stat-note">Comparaison, classement ou total selon le resultat.</div>
+                <div id="statReadingNote" class="stat-note">Lecture rapide.</div>
               </div>
             </div>
           </div>
@@ -1104,8 +1071,8 @@
           <div class="panel">
             <div class="panel-header">
               <div>
-                <span class="panel-title">Donnees retournees</span>
-                <div class="panel-subtitle">Tri, filtre local et export CSV sur le resultat visible</div>
+                <span class="panel-title">Table</span>
+                <div class="panel-subtitle">Filtre et export</div>
               </div>
               <div class="panel-tools">
                 <input id="tableFilterInput" type="text" placeholder="Filtrer une valeur..." />
@@ -1114,15 +1081,15 @@
               </div>
             </div>
             <div id="tableContainer" class="table-container">
-              <div class="empty-state">Aucune ligne retournee pour le moment.</div>
+              <div class="empty-state">Aucune ligne.</div>
             </div>
           </div>
 
           <div class="panel">
             <div class="panel-header">
               <div>
-                <span class="panel-title">Visualisation Plotly</span>
-                <div class="panel-subtitle">Graphique interactif quand le resultat s'y prete</div>
+                <span class="panel-title">Graphique</span>
+                <div class="panel-subtitle">Graphique quand utile</div>
               </div>
             </div>
             <div id="vizContainer" class="viz-container">
@@ -1135,8 +1102,8 @@
           <aside class="history-panel">
             <div class="panel-header">
               <div>
-                <div class="panel-title">Historique local</div>
-                <div class="panel-subtitle">Questions recentes pour l'utilisateur courant</div>
+                <div class="panel-title">Historique</div>
+                <div class="panel-subtitle">Questions recentes</div>
               </div>
               <button id="refreshHistoryBtn" class="btn btn-ghost">Actualiser</button>
             </div>
@@ -1391,31 +1358,31 @@
       if (!shape) {
         statMetric.textContent = rows && rows.length ? "Resultat" : "En attente";
         statMetricNote.textContent = rows && rows.length
-          ? "Le format retourne n'a pas de lecture rapide standard."
-          : "Le principal indicateur apparaitra ici.";
+          ? "Format libre."
+          : "Indicateur principal.";
         statLeader.textContent = rows && rows.length ? `${rows.length} ligne${rows.length > 1 ? "s" : ""}` : "En attente";
         statLeaderNote.textContent = rows && rows.length
-          ? "Les donnees sont bien retournees mais sans leader detecte automatiquement."
-          : "La meilleure valeur sera mise en avant quand c'est possible.";
+          ? "Aucun leader detecte."
+          : "Valeur tete.";
         statReading.textContent = rows && rows.length ? "Generique" : "Aucune";
         statReadingNote.textContent = rows && rows.length
-          ? "Lecture simple sans interpretation supplementaire."
-          : "Comparaison, classement ou total selon le resultat.";
+          ? "Lecture simple."
+          : "Classement ou total.";
         return;
       }
 
       const metricName = shape.metricColumn;
       statMetric.textContent = metricName.toUpperCase();
       statMetricNote.textContent = shape.labelColumn
-        ? `Lecture basee sur ${shape.labelColumn}.`
-        : "Valeur agregee unique.";
+        ? `Basee sur ${shape.labelColumn}.`
+        : "Valeur unique.";
 
       if (!shape.labelColumn) {
         const value = rows[0][shape.metricColumn];
         statLeader.textContent = formatNumber(value);
-        statLeaderNote.textContent = "Valeur principale retournee par la requete.";
+        statLeaderNote.textContent = "Valeur principale.";
         statReading.textContent = "KPI";
-        statReadingNote.textContent = "Lecture directe d'un indicateur unique.";
+        statReadingNote.textContent = "Indicateur unique.";
         return;
       }
 
@@ -1427,14 +1394,14 @@
       statLeaderNote.textContent = `${formatNumber(topRow[shape.metricColumn])}${secondRow ? `, devant ${secondRow[shape.labelColumn]}.` : "."}`;
       statReading.textContent = rows.length > 1 ? "Classement" : "Detail";
       statReadingNote.textContent = rows.length > 1
-        ? `${rows.length} elements compares sur ${metricName}.`
-        : "Une seule ligne disponible dans le resultat.";
+        ? `${rows.length} lignes comparees.`
+        : "Une seule ligne.";
     }
 
     function renderVisualization(rows) {
       const shape = detectDatasetShape(rows);
       if (!shape || !shape.labelColumn) {
-        vizContainer.innerHTML = '<div class="empty-state">Aucune visualisation disponible pour ce format de resultat.</div>';
+        vizContainer.innerHTML = '<div class="empty-state">Pas de graphique disponible.</div>';
         return;
       }
 
@@ -1444,7 +1411,7 @@
 
       const maxValue = Math.max(...topRows.map((row) => row[shape.metricColumn] || 0), 0);
       if (maxValue <= 0) {
-        vizContainer.innerHTML = '<div class="empty-state">Les valeurs retournees ne permettent pas de construire une vue comparative.</div>';
+        vizContainer.innerHTML = '<div class="empty-state">Valeurs insuffisantes.</div>';
         return;
       }
 
@@ -1495,14 +1462,14 @@
     }
 
     function updateMeta(data) {
-      resolvedQuestionValue.textContent = data.resolved_question || data.question || "Aucune reformulation pour le moment.";
+      resolvedQuestionValue.textContent = data.resolved_question || data.question || "Aucune reformulation.";
       routeMetaValue.textContent = `${data.route.toUpperCase()} - ${data.artifact.language}${data.sources.length ? " - sources documentaires" : ""}`;
       if (data.data && data.data.length > 0) {
         dataMetaValue.textContent = `${data.data.length} ligne${data.data.length > 1 ? "s" : ""} retournee${data.data.length > 1 ? "s" : ""}.`;
       } else if (data.sources && data.sources.length > 0) {
         dataMetaValue.textContent = `${data.sources.length} source${data.sources.length > 1 ? "s" : ""} documentaire${data.sources.length > 1 ? "s" : ""}.`;
       } else {
-        dataMetaValue.textContent = "Aucune ligne retournee pour cette reponse.";
+        dataMetaValue.textContent = "Aucune ligne.";
       }
     }
 
@@ -1604,7 +1571,7 @@
     async function executeQuery() {
       const q = promptInput.value.trim();
       if (!q) {
-        answerText.textContent = "Saisis une question avant de lancer l'analyse.";
+        answerText.textContent = "Saisis une question avant de lancer.";
         routeBadge.className = "badge badge-neutral";
         routeBadge.textContent = "Question vide";
         return;
@@ -1612,13 +1579,13 @@
 
       runBtn.disabled = true;
       runBtn.textContent = "Chargement...";
-      answerText.textContent = "Analyse de la demande en cours...";
+      answerText.textContent = "Analyse en cours...";
       codeBlock.textContent = "-- Generation de la requete en cours...";
       tableContainer.innerHTML = '<div class="empty-state">Chargement des donnees...</div>';
       vizContainer.innerHTML = '<div class="empty-state">Preparation du graphique...</div>';
-      resolvedQuestionValue.textContent = "Resolution de la question en cours...";
-      routeMetaValue.textContent = "Selection de la meilleure route...";
-      dataMetaValue.textContent = "Preparation des resultats...";
+      resolvedQuestionValue.textContent = "Resolution en cours.";
+      routeMetaValue.textContent = "Choix automatique...";
+      dataMetaValue.textContent = "Preparation...";
 
       try {
         const response = await fetch("/api/chat", {
@@ -1662,9 +1629,9 @@
         tableContainer.innerHTML = '<div class="empty-state">Erreur lors de la recuperation des donnees.</div>';
         renderStats([]);
         renderVisualization([]);
-        resolvedQuestionValue.textContent = "Impossible de resoudre la demande.";
-        routeMetaValue.textContent = "Le traitement a echoue.";
-        dataMetaValue.textContent = "Aucun resultat exploitable.";
+        resolvedQuestionValue.textContent = "Demande non resolue.";
+        routeMetaValue.textContent = "Traitement echoue.";
+        dataMetaValue.textContent = "Aucun resultat.";
       } finally {
         runBtn.disabled = false;
         runBtn.textContent = "Lancer";
@@ -1677,9 +1644,9 @@
       currentRows = [];
       currentVisibleRows = [];
       currentSort = { column: null, direction: "asc" };
-      answerText.textContent = "Pose une question ci-dessus pour afficher une reponse claire, les sources utiles et les donnees associees.";
+      answerText.textContent = "Pose une question pour afficher une reponse claire et les donnees associees.";
       codeBlock.textContent = "-- La requete generee apparaitra ici";
-      tableContainer.innerHTML = '<div class="empty-state">Aucune ligne retournee pour le moment.</div>';
+      tableContainer.innerHTML = '<div class="empty-state">Aucune ligne.</div>';
       vizContainer.innerHTML = '<div class="empty-state">Aucun graphique disponible pour le moment.</div>';
       sourcesRow.style.display = "none";
       routeBadge.className = "badge badge-neutral";
@@ -1687,9 +1654,9 @@
       auditBadge.textContent = "en attente";
       artifactBadge.textContent = "en attente";
       rowCountBadge.textContent = "0 ligne";
-      resolvedQuestionValue.textContent = "Aucune reformulation pour le moment.";
-      routeMetaValue.textContent = "Le moteur choisira automatiquement la meilleure voie.";
-      dataMetaValue.textContent = "Aucune ligne retournee pour le moment.";
+      resolvedQuestionValue.textContent = "Aucune reformulation.";
+      routeMetaValue.textContent = "Choix automatique.";
+      dataMetaValue.textContent = "Aucune ligne.";
       renderStats([]);
     }
 
