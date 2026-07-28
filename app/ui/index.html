@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI BI Copilot</title>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <style>
     :root {
       --bg: #07111b;
@@ -764,6 +765,11 @@
       line-height: 1.5;
     }
 
+    .plotly-chart {
+      min-height: 320px;
+      width: 100%;
+    }
+
     .history-list {
       display: grid;
       gap: 10px;
@@ -1115,12 +1121,12 @@
           <div class="panel">
             <div class="panel-header">
               <div>
-                <span class="panel-title">Lecture visuelle</span>
-                <div class="panel-subtitle">Une vue barres simple quand le resultat s'y prete</div>
+                <span class="panel-title">Visualisation Plotly</span>
+                <div class="panel-subtitle">Graphique interactif quand le resultat s'y prete</div>
               </div>
             </div>
             <div id="vizContainer" class="viz-container">
-              <div class="empty-state">Aucune visualisation disponible pour le moment.</div>
+              <div class="empty-state">Aucun graphique disponible pour le moment.</div>
             </div>
           </div>
         </div>
@@ -1467,6 +1473,27 @@
       `;
     }
 
+    function renderPlotlyVisualization(visualization, rows) {
+      if (!visualization || !visualization.enabled || !visualization.figure) {
+        renderVisualization(rows);
+        return;
+      }
+
+      if (!window.Plotly || typeof window.Plotly.newPlot !== "function") {
+        renderVisualization(rows);
+        return;
+      }
+
+      vizContainer.innerHTML = '<div id="plotlyChart" class="plotly-chart"></div>';
+      const figure = visualization.figure;
+      window.Plotly.newPlot(
+        "plotlyChart",
+        figure.data || [],
+        figure.layout || {},
+        figure.config || { displaylogo: false, responsive: true }
+      );
+    }
+
     function updateMeta(data) {
       resolvedQuestionValue.textContent = data.resolved_question || data.question || "Aucune reformulation pour le moment.";
       routeMetaValue.textContent = `${data.route.toUpperCase()} - ${data.artifact.language}${data.sources.length ? " - sources documentaires" : ""}`;
@@ -1588,7 +1615,7 @@
       answerText.textContent = "Analyse de la demande en cours...";
       codeBlock.textContent = "-- Generation de la requete en cours...";
       tableContainer.innerHTML = '<div class="empty-state">Chargement des donnees...</div>';
-      vizContainer.innerHTML = '<div class="empty-state">Preparation de la lecture visuelle...</div>';
+      vizContainer.innerHTML = '<div class="empty-state">Preparation du graphique...</div>';
       resolvedQuestionValue.textContent = "Resolution de la question en cours...";
       routeMetaValue.textContent = "Selection de la meilleure route...";
       dataMetaValue.textContent = "Preparation des resultats...";
@@ -1618,7 +1645,7 @@
         renderSources(data.sources);
         renderTable(data.data);
         renderStats(data.data);
-        renderVisualization(data.data);
+        renderPlotlyVisualization(data.visualization, data.data);
         updateMeta({
           ...data,
           question: q,
@@ -1653,7 +1680,7 @@
       answerText.textContent = "Pose une question ci-dessus pour afficher une reponse claire, les sources utiles et les donnees associees.";
       codeBlock.textContent = "-- La requete generee apparaitra ici";
       tableContainer.innerHTML = '<div class="empty-state">Aucune ligne retournee pour le moment.</div>';
-      vizContainer.innerHTML = '<div class="empty-state">Aucune visualisation disponible pour le moment.</div>';
+      vizContainer.innerHTML = '<div class="empty-state">Aucun graphique disponible pour le moment.</div>';
       sourcesRow.style.display = "none";
       routeBadge.className = "badge badge-neutral";
       routeBadge.textContent = "En attente";

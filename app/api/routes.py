@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 from app.agents.graph import copilot_graph
 from app.core.conversation_memory import remember_turn, resolve_question
 from app.core.audit import new_audit_id, read_audit_entries, write_audit
-from app.models.schemas import ChatRequest, ChatResponse, HistoryEntry, QueryArtifact
+from app.models.schemas import ChatRequest, ChatResponse, HistoryEntry, QueryArtifact, VisualizationSpec
 
 router = APIRouter()
 
@@ -48,6 +48,7 @@ def chat(req: ChatRequest):
             ),
             data=result.get("rows", []),
             sources=result.get("sources", []),
+            visualization=VisualizationSpec(**result.get("visualization", {})),
             audit_id=audit_id,
         )
     except Exception as exc:

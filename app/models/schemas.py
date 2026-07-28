@@ -14,12 +14,21 @@ class QueryArtifact(BaseModel):
     query: str | None = None
 
 
+class VisualizationSpec(BaseModel):
+    enabled: bool = False
+    kind: str | None = None
+    title: str | None = None
+    figure: dict[str, Any] | None = None
+    reason: str | None = None
+
+
 class ChatResponse(BaseModel):
     answer: str
     route: str
     artifact: QueryArtifact
     data: list[dict[str, Any]] = []
     sources: list[str] = []
+    visualization: VisualizationSpec = Field(default_factory=VisualizationSpec)
     audit_id: str
 
 

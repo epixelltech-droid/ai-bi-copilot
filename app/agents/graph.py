@@ -10,6 +10,7 @@ from app.connectors.powerbi import execute_dax
 from app.connectors.sqlite_demo import execute_demo_sql
 from app.rag.knowledge import retrieve
 from app.rag.retriever import answer_from_context, retrieve as retrieve_chunks
+from app.visualization.plotly_builder import build_visualization
 
 
 class CopilotState(TypedDict, total=False):
@@ -22,6 +23,7 @@ class CopilotState(TypedDict, total=False):
     query_language: str
     rows: list[dict[str, Any]]
     answer: str
+    visualization: dict[str, Any]
 
 
 def router_node(state):
@@ -38,6 +40,7 @@ def rag_node(state):
         "query_language": "NONE",
         "rows": [],
         "answer": rag_result["answer"],
+        "visualization": build_visualization(state["question"], []),
     }
 
 
@@ -52,6 +55,7 @@ def sql_node(state):
         "query_language": "SQL",
         "rows": rows,
         "answer": build_insight(state["question"], rows, ctx),
+        "visualization": build_visualization(state["question"], rows),
     }
 
 
@@ -71,6 +75,7 @@ def powerbi_node(state):
         "query_language": "DAX",
         "rows": rows,
         "answer": answer,
+        "visualization": build_visualization(state["question"], rows),
     }
 
 

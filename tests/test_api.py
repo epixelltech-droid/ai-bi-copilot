@@ -62,6 +62,9 @@ def test_chat_sql_mode(client):
     assert body["data"]
     assert body["answer"]
     assert body["sources"] == []
+    assert body["visualization"]["enabled"] is True
+    assert body["visualization"]["kind"] == "bar"
+    assert body["visualization"]["figure"]
     assert body["audit_id"]
 
 
@@ -82,6 +85,7 @@ def test_chat_rag_mode(client):
     assert body["artifact"]["language"] == "NONE"
     assert body["answer"]
     assert any(source in body["sources"] for source in ["kpi_dictionary.md", "business_rules.md"])
+    assert body["visualization"]["enabled"] is False
     assert body["audit_id"]
 
 

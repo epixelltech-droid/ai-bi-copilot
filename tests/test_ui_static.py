@@ -45,6 +45,8 @@ def test_ui_exposes_main_controls_and_bindings():
     assert 'id="copyCodeBtn"' in html
     assert 'id="tableFilterInput"' in html
     assert 'id="exportCsvBtn"' in html
+    assert 'https://cdn.plot.ly/plotly-2.35.2.min.js' in html
+    assert 'renderPlotlyVisualization(data.visualization, data.data)' in html
     assert 'id="promptInput"' in html
     assert 'id="userIdInput"' in html
     assert 'runBtn.addEventListener("click", executeQuery)' in html
@@ -185,6 +187,7 @@ let chatRequests = 0;
 let clipboardValue = "";
 let anchorClicks = 0;
 let exportedHref = "";
+let plotlyRenderCount = 0;
 
 global.document = {
   getElementById(id) {
@@ -209,6 +212,18 @@ global.document = {
 };
 
 global.window = global;
+global.Plotly = {
+  newPlot(target, data, layout, config) {
+    if (target !== "plotlyChart") {
+      throw new Error("Plotly target mismatch");
+    }
+    if (!Array.isArray(data) || data[0].type !== "bar") {
+      throw new Error("Plotly received an invalid trace");
+    }
+    plotlyRenderCount += 1;
+    return Promise.resolve({ layout, config });
+  },
+};
 global.navigator = {
   clipboard: {
     async writeText(value) {
@@ -285,6 +300,16 @@ global.fetch = async (url, options = {}) => {
             { country: "Maroc", revenue: 200 },
           ],
           sources: [],
+          visualization: {
+            enabled: true,
+            kind: "bar",
+            title: "Revenue by Country",
+            figure: {
+              data: [{ type: "bar", x: ["Maroc", "France"], y: [200, 100] }],
+              layout: { title: { text: "Revenue by Country" } },
+              config: { displaylogo: false, responsive: true },
+            },
+          },
           audit_id: "audit-sql",
         };
       },
@@ -321,6 +346,9 @@ async function flush() {
   }
   if (!elements.tableContainer.innerHTML.includes("France") || !elements.tableContainer.innerHTML.includes("Maroc")) {
     throw new Error("SQL rows not rendered");
+  }
+  if (plotlyRenderCount !== 1 || !elements.vizContainer.innerHTML.includes("plotlyChart")) {
+    throw new Error("Plotly chart was not rendered");
   }
 
       elements.tableFilterInput.value = "Maroc";
