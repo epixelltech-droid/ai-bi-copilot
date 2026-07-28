@@ -1,13 +1,13 @@
 # AI BI Copilot
 
-Local multi-agent BI copilot built with `FastAPI`, `LangGraph`, `SQLite`, and a lightweight offline `RAG`.
+Local-first multi-agent BI copilot built with `FastAPI`, `LangGraph`, `SQLite`, and an offline `RAG`.
 
-The goal is simple: let a user ask business questions in natural language and route the request to the right engine:
+It lets a user ask business questions in natural language and automatically route the request to the right engine:
 
 - `SQL` for analytical questions on structured data
 - `RAG` for KPI definitions, business rules, and data documentation
 
-This repository is designed as a clean, local-first portfolio project: readable, testable, and easy to run.
+This repository is designed as a portfolio-ready project: local, testable, readable, and easy to demo.
 
 ## Why This Project
 
@@ -16,7 +16,7 @@ Business users usually need two kinds of answers:
 1. answers computed from data
 2. answers grounded in business documentation
 
-This project combines both in a single API flow.
+This project combines both in a single product flow with a local demo UI, short conversation memory, and traceable responses.
 
 Examples:
 
@@ -33,6 +33,8 @@ Examples:
 - transforms SQL rows into business-friendly insights
 - retrieves documentation from a local Markdown knowledge base
 - returns grounded documentary answers with sources
+- keeps short local conversation memory for follow-up questions
+- exposes local history for recent interactions
 - logs each interaction in a simple audit trail
 
 ## Current Architecture
@@ -48,6 +50,17 @@ POST /api/chat
 ```
 
 The app also exposes a lightweight local demo UI at `/` for trying the project without going through Swagger first.
+
+## Demo Snapshot
+
+- local UI with SQL / RAG routing
+- result summary cards
+- inline visual reading for simple SQL outputs
+- local interaction history by user
+
+Screenshot area:
+
+- future UI captures can be stored in `docs/assets/`
 
 ## Architecture Diagram
 
@@ -113,7 +126,14 @@ Supports documentary questions such as:
 - differences between KPIs such as `Revenue`, `Cost`, and `Margin`
 - country and category interpretation rules
 
-### 3. BI data model
+### 3. Product-like local UX
+
+- local UI at `/`
+- route, sources, artifact, and audit visibility
+- short conversation memory for follow-up questions such as `et en 2026 ?`
+- local history endpoint and clickable history in the UI
+
+### 4. BI data model
 
 The demo database uses a simple star schema:
 
@@ -122,7 +142,7 @@ The demo database uses a simple star schema:
 - `dim_product`
 - `dim_date`
 
-### 4. Safe local execution
+### 5. Safe local execution
 
 - read-only SQL validation
 - no required Internet access
@@ -234,7 +254,7 @@ Typical answer:
 
 A simple demo flow for interviews or portfolio review:
 
-1. open `http://127.0.0.1:8000/docs`
+1. open `http://127.0.0.1:8000/`
 2. verify `GET /health`
 3. test a SQL question such as `Quel est le chiffre d'affaires par pays ?`
 4. test another SQL question such as `Quel est le top 5 des produits en quantite ?`
@@ -242,6 +262,7 @@ A simple demo flow for interviews or portfolio review:
 6. test a RAG question such as `Comment calcule-t-on l'ASP ?`
 7. test a short documentary question such as `Que veut dire SMB ?`
 8. show that the RAG answer returns sources
+9. show the local history and follow-up behavior
 
 Detailed walkthrough:
 
@@ -321,6 +342,7 @@ This makes the project easy to understand, test, and demonstrate.
 - `docs/DEMO_SCRIPT.md`
 - `docs/DEMO_WALKTHROUGH.md`
 - `docs/PRODUCT_NEXT_STEPS.md`
+- `docs/V2_SCOPE.md`
 - `CHANGELOG.md`
 
 ## What Makes It Interesting
@@ -340,10 +362,13 @@ This project is a good showcase of:
 Current state:
 
 - local V1 working
+- V2 lots 2 to 9 implemented
 - SQL path working
 - RAG path working
-- `116` automated tests passing
-- GitHub repository initialized
+- local UI working
+- short memory and history working
+- `151` automated tests passing
+- GitHub repository initialized and updated
 
 ## Notes
 

@@ -7,6 +7,7 @@ This walkthrough helps present the project clearly during a demo, interview, or 
 The objective is to show:
 
 1. the API is live
+2. the local UI feels usable
 2. the SQL path works
 3. the RAG path works
 4. the project stays fully local for the current V1
@@ -23,6 +24,7 @@ Open:
 What to say:
 
 - the project now includes a lightweight local demo UI for quick product-style testing
+- the UI now surfaces route, query, answer, sources, and recent local history
 - the project exposes a simple FastAPI interface
 - the main endpoint is `POST /api/chat`
 - the same endpoint can route to SQL or RAG depending on the question
@@ -58,6 +60,7 @@ What to highlight:
 - the SQL Agent generates a read-only query
 - SQLite executes the query on the star schema
 - the Insight Agent returns a business-friendly answer
+- the UI can summarize the result and show a simple visual comparison
 
 What to mention:
 
@@ -114,6 +117,19 @@ What to highlight:
 - short documentary questions are also handled
 - no hallucinated value should be introduced
 
+### 8. Show follow-up behavior and history
+
+Use a short sequence such as:
+
+1. `Quel est le chiffre d'affaires par pays ?`
+2. `et en 2026 ?`
+
+What to highlight:
+
+- the local memory resolves the short follow-up question
+- the UI keeps recent local history
+- previous questions can be reused quickly from the history panel
+
 ## Recommended Questions
 
 ### SQL
@@ -147,6 +163,7 @@ Example:
 This project demonstrates:
 
 - API design
+- local product thinking and demo UX
 - agent orchestration
 - BI-oriented SQL generation
 - star schema usage

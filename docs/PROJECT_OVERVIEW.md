@@ -49,6 +49,7 @@ Flow:
 ## Current Functional Scope
 
 - local FastAPI API
+- local demo UI
 - local SQLite BI model
 - star schema:
   - `fact_sales`
@@ -60,6 +61,8 @@ Flow:
 - deterministic business insight generation
 - local offline RAG over Markdown files
 - improved local RAG over KPI definitions, business rules, and data dictionary content
+- short-term conversation memory for follow-up questions
+- local history and audit visibility
 - SQL safety validation
 - audit logging
 - automated tests
