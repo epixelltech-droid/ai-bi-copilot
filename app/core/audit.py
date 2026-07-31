@@ -25,6 +25,7 @@ def write_audit(
     source_count=0,
     used_memory=False,
     answer_preview=None,
+    hybrid_meta=None,
 ):
     AUDIT_FILE.parent.mkdir(parents=True, exist_ok=True)
     payload = {
@@ -42,6 +43,7 @@ def write_audit(
         "source_count": source_count,
         "used_memory": used_memory,
         "answer_preview": answer_preview,
+        "hybrid_meta": hybrid_meta or {},
         "error": error,
     }
     with AUDIT_FILE.open("a", encoding="utf-8") as f:

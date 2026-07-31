@@ -150,6 +150,9 @@ def test_history_endpoint_returns_recent_entries(client):
     assert "query_language" in body[0]
     assert "source_count" in body[0]
     assert "answer_preview" in body[0]
+    assert "hybrid_meta" in body[0]
+    assert "llm" in body[0]["hybrid_meta"]
+    assert "router_mode" in body[0]["hybrid_meta"]
 
 
 def test_history_endpoint_shows_memory_usage(client):
@@ -180,6 +183,29 @@ def test_history_endpoint_shows_memory_usage(client):
     assert body[0]["used_memory"] is True
     assert body[0]["resolved_question"] != body[0]["question"]
     assert "2026" in body[0]["resolved_question"]
+
+
+def test_history_endpoint_exposes_hybrid_modes(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires par pays ?",
+            "user_id": "history-hybrid-user",
+            "source": "auto",
+        },
+    )
+
+    assert response.status_code == 200
+
+    history_response = client.get("/api/history/history-hybrid-user")
+    body = history_response.json()
+
+    assert history_response.status_code == 200
+    assert body[0]["hybrid_meta"]["llm"]["configured"] is False
+    assert body[0]["hybrid_meta"]["llm"]["provider"] == "none"
+    assert body[0]["hybrid_meta"]["router_mode"] == "deterministic"
+    assert body[0]["hybrid_meta"]["sql_generation_mode"] == "deterministic"
+    assert body[0]["hybrid_meta"]["response_mode"] == "local"
 
 
 def test_chat_rag_enterprise_mode(client):

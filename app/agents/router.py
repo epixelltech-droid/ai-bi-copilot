@@ -157,6 +157,7 @@ def analyze_question(question: str, preferred: str = "auto") -> dict[str, str]:
             "route": preferred,
             "rewritten_question": question,
             "reason": "preferred source",
+            "mode": "preferred",
         }
 
     llm_result = llm_json(ROUTER_SYSTEM, question)
@@ -169,12 +170,14 @@ def analyze_question(question: str, preferred: str = "auto") -> dict[str, str]:
                 "route": route,
                 "rewritten_question": rewritten_question,
                 "reason": reason,
+                "mode": "llm",
             }
 
     return {
         "route": _deterministic_route(question),
         "rewritten_question": question,
         "reason": "deterministic fallback",
+        "mode": "deterministic",
     }
 
 

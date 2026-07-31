@@ -114,6 +114,7 @@ def answer_from_context(question: str, chunks: list[dict]) -> dict:
         return {
             "answer": "Je n'ai pas trouve cette information dans la base documentaire.",
             "sources": [],
+            "mode": "local_empty",
         }
 
     normalized_question = _normalize_text(question)
@@ -133,6 +134,7 @@ def answer_from_context(question: str, chunks: list[dict]) -> dict:
             return {
                 "answer": cleaned,
                 "sources": sources,
+                "mode": "llm",
             }
 
     answer = local_answer
@@ -144,6 +146,7 @@ def answer_from_context(question: str, chunks: list[dict]) -> dict:
     return {
         "answer": answer,
         "sources": sources,
+        "mode": "local",
     }
 
 

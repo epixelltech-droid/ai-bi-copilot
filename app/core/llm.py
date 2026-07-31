@@ -34,6 +34,33 @@ def get_llm_client() -> tuple[OpenAI, str] | None:
     return None
 
 
+def get_llm_runtime_info() -> dict[str, str | bool]:
+    settings = get_settings()
+    if settings.openai_api_key and settings.openai_model:
+        return {
+            "provider": "openai",
+            "model": settings.openai_model,
+            "configured": True,
+        }
+
+    if (
+        settings.azure_openai_endpoint
+        and settings.azure_openai_api_key
+        and settings.azure_openai_deployment
+    ):
+        return {
+            "provider": "azure_openai",
+            "model": settings.azure_openai_deployment,
+            "configured": True,
+        }
+
+    return {
+        "provider": "none",
+        "model": "",
+        "configured": False,
+    }
+
+
 def llm_text(system: str, user: str) -> str | None:
     client_config = get_llm_client()
     if client_config is None:

@@ -3,13 +3,14 @@ from typing import Any, TypedDict
 from langgraph.graph import END, START, StateGraph
 
 from app.agents.dax_agent import generate_dax
-from app.agents.insight_agent import build_insight
+from app.agents.insight_agent import build_insight, build_insight_details
 from app.agents.router import analyze_question
-from app.agents.sql_agent import generate_sql
+from app.agents.sql_agent import generate_sql, generate_sql_details
 from app.connectors.powerbi import execute_dax
 from app.connectors.sqlite_demo import execute_demo_sql
 from app.rag.knowledge import retrieve
 from app.rag.retriever import answer_from_context, retrieve as retrieve_chunks
+from app.core.llm import get_llm_runtime_info
 from app.visualization.plotly_builder import build_visualization
 
 
@@ -24,6 +25,7 @@ class CopilotState(TypedDict, total=False):
     rows: list[dict[str, Any]]
     answer: str
     visualization: dict[str, Any]
+    hybrid_meta: dict[str, Any]
 
 
 def router_node(state):
@@ -31,6 +33,13 @@ def router_node(state):
     return {
         "route": analysis["route"],
         "question": analysis["rewritten_question"],
+        "hybrid_meta": {
+            "llm": get_llm_runtime_info(),
+            "router_mode": analysis["mode"],
+            "router_reason": analysis["reason"],
+            "rewritten_by_router": analysis["rewritten_question"] != state["question"],
+            "original_question": state["question"],
+        },
     }
 
 
@@ -45,21 +54,32 @@ def rag_node(state):
         "rows": [],
         "answer": rag_result["answer"],
         "visualization": build_visualization(state["question"], []),
+        "hybrid_meta": {
+            **state.get("hybrid_meta", {}),
+            "response_mode": rag_result.get("mode", "local"),
+        },
     }
 
 
 def sql_node(state):
-    q = generate_sql(state["question"])
+    sql_result = generate_sql_details(state["question"])
+    q = sql_result["query"]
     rows = execute_demo_sql(q)
     ctx = retrieve(state["question"])
+    insight_result = build_insight_details(state["question"], rows, ctx)
     return {
         "context": ctx,
         "sources": [],
         "query": q,
         "query_language": "SQL",
         "rows": rows,
-        "answer": build_insight(state["question"], rows, ctx),
+        "answer": insight_result["answer"],
         "visualization": build_visualization(state["question"], rows),
+        "hybrid_meta": {
+            **state.get("hybrid_meta", {}),
+            "sql_generation_mode": sql_result["mode"],
+            "response_mode": insight_result["mode"],
+        },
     }
 
 

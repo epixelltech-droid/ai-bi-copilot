@@ -47,4 +47,5 @@ class HistoryEntry(BaseModel):
     source_count: int = 0
     used_memory: bool = False
     answer_preview: str | None = None
+    hybrid_meta: dict[str, Any] = Field(default_factory=dict)
     error: str | None = None

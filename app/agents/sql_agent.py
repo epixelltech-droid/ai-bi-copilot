@@ -548,7 +548,7 @@ LIMIT 20
 """.strip()
 
 
-def generate_sql(question: str) -> str:
+def generate_sql_details(question: str) -> dict[str, str]:
     deterministic_query = deterministic_sql(question)
     schema_text = format_schema_for_llm()
     prompt = (
@@ -562,8 +562,18 @@ def generate_sql(question: str) -> str:
     if query:
         cleaned_query = query.replace("```sql", "").replace("```", "").strip()
         try:
-            return validate_readonly_sql(cleaned_query)
+            return {
+                "query": validate_readonly_sql(cleaned_query),
+                "mode": "llm",
+            }
         except ValueError:
             pass
 
-    return validate_readonly_sql(deterministic_query)
+    return {
+        "query": validate_readonly_sql(deterministic_query),
+        "mode": "deterministic",
+    }
+
+
+def generate_sql(question: str) -> str:
+    return generate_sql_details(question)["query"]

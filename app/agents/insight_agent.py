@@ -14,8 +14,15 @@ Keep it strictly grounded in the provided data.
 
 
 def build_insight(question: str, rows: list[dict], context: list[dict]) -> str:
+    return build_insight_details(question, rows, context)["answer"]
+
+
+def build_insight_details(question: str, rows: list[dict], context: list[dict]) -> dict[str, str]:
     if not rows:
-        return "Aucune donnee ne correspond a la requete."
+        return {
+            "answer": "Aucune donnee ne correspond a la requete.",
+            "mode": "local_empty",
+        }
 
     local_answer = _build_local_insight(question, rows, context)
     prompt = json.dumps(
@@ -32,9 +39,15 @@ def build_insight(question: str, rows: list[dict], context: list[dict]) -> str:
     if result:
         cleaned = result.strip()
         if cleaned and _looks_reasonably_french(cleaned):
-            return cleaned
+            return {
+                "answer": cleaned,
+                "mode": "llm",
+            }
 
-    return local_answer
+    return {
+        "answer": local_answer,
+        "mode": "local",
+    }
 
 
 def _build_local_insight(question: str, rows: list[dict], context: list[dict]) -> str:

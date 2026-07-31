@@ -38,6 +38,7 @@ def chat(req: ChatRequest):
             source_count=len(result.get("sources", [])),
             used_memory=used_memory,
             answer_preview=_answer_preview(result.get("answer", "")),
+            hybrid_meta=result.get("hybrid_meta", {}),
         )
         return ChatResponse(
             answer=result["answer"],
@@ -67,6 +68,7 @@ def chat(req: ChatRequest):
             source_count=len(result.get("sources", [])),
             used_memory=used_memory,
             answer_preview=_answer_preview(result.get("answer", "")),
+            hybrid_meta=result.get("hybrid_meta", {}),
         )
         raise HTTPException(status_code=400, detail=str(exc))
 
