@@ -1,7 +1,18 @@
+import json
 import re
 import unicodedata
 
+from app.core.llm import llm_text
 from app.rag.document_loader import chunk_documents, load_markdown_documents
+
+SYSTEM = """
+You answer in French using only the provided documentary passages.
+Be concise, natural, and professional.
+Do not invent anything that is not explicitly supported by the passages.
+French only. Do not answer in English.
+Do not use markdown headings or bullet lists unless the passages already require them.
+Return plain text only.
+""".strip()
 
 STOPWORDS = {
     "a", "alors", "au", "aucun", "aucune", "aux", "avec", "ce", "ces", "comment",
@@ -107,37 +118,24 @@ def answer_from_context(question: str, chunks: list[dict]) -> dict:
 
     normalized_question = _normalize_text(question)
     sources = _unique_sources(chunks)
+    local_answer = _build_local_answer(question, chunks, normalized_question)
 
-    if "margin" in normalized_question and "%" in question:
-        answer = _build_definition_answer(question, chunks)
-    elif "difference entre" in normalized_question:
-        answer = _build_difference_answer(question, chunks)
-    elif "gross margin" in normalized_question:
-        answer = _build_definition_answer(question, chunks)
-    elif "top product" in normalized_question or ("top" in normalized_question and "produit" in normalized_question):
-        answer = _build_business_rule_answer(chunks, "top product")
-    elif "top customer" in normalized_question or ("top" in normalized_question and "client" in normalized_question):
-        answer = _build_business_rule_answer(chunks, "top customer")
-    elif "smb" in normalized_question:
-        answer = _build_line_answer(chunks, "SMB")
-    elif "retail" in normalized_question and "client" in normalized_question:
-        answer = _build_line_answer(chunks, "Retail")
-    elif "enterprise" in normalized_question and "client" in normalized_question:
-        answer = _build_enterprise_answer(chunks)
-    elif "segment" in normalized_question:
-        answer = _build_segment_answer(chunks)
-    elif "categorie" in normalized_question or "category" in normalized_question:
-        answer = _build_category_answer(chunks)
-    elif "pays" in normalized_question or "country" in normalized_question:
-        answer = _build_country_answer(chunks)
-    elif normalized_question in {"revenue", "margin", "cost", "asp", "smb", "gross margin"}:
-        answer = _build_definition_answer(question, chunks)
-    elif any(pattern in normalized_question for pattern in ["que signifie", "definition"]):
-        answer = _build_definition_answer(question, chunks)
-    elif any(pattern in normalized_question for pattern in ["comment calcule", "formule", "calcule t on"]):
-        answer = _build_formula_answer(chunks)
-    else:
-        answer = _build_generic_answer(chunks)
+    prompt = (
+        f"QUESTION:\n{question}\n\n"
+        f"PASSAGES:\n{json.dumps(chunks[:5], ensure_ascii=False, default=str)}\n\n"
+        f"LOCAL_ANSWER:\n{local_answer}\n\n"
+        "Rewrite the local answer in French using only the passages."
+    )
+    result = llm_text(SYSTEM, prompt)
+    if result:
+        cleaned = _strip_markdown(result).strip()
+        if cleaned and _looks_reasonably_french(cleaned):
+            return {
+                "answer": cleaned,
+                "sources": sources,
+            }
+
+    answer = local_answer
 
     if not answer:
         answer = "Je n'ai pas trouve cette information dans la base documentaire."
@@ -147,6 +145,38 @@ def answer_from_context(question: str, chunks: list[dict]) -> dict:
         "answer": answer,
         "sources": sources,
     }
+
+
+def _build_local_answer(question: str, chunks: list[dict], normalized_question: str) -> str:
+    if "margin" in normalized_question and "%" in question:
+        return _build_definition_answer(question, chunks)
+    if "difference entre" in normalized_question:
+        return _build_difference_answer(question, chunks)
+    if "gross margin" in normalized_question:
+        return _build_definition_answer(question, chunks)
+    if "top product" in normalized_question or ("top" in normalized_question and "produit" in normalized_question):
+        return _build_business_rule_answer(chunks, "top product")
+    if "top customer" in normalized_question or ("top" in normalized_question and "client" in normalized_question):
+        return _build_business_rule_answer(chunks, "top customer")
+    if "smb" in normalized_question:
+        return _build_line_answer(chunks, "SMB")
+    if "retail" in normalized_question and "client" in normalized_question:
+        return _build_line_answer(chunks, "Retail")
+    if "enterprise" in normalized_question and "client" in normalized_question:
+        return _build_enterprise_answer(chunks)
+    if "segment" in normalized_question:
+        return _build_segment_answer(chunks)
+    if "categorie" in normalized_question or "category" in normalized_question:
+        return _build_category_answer(chunks)
+    if "pays" in normalized_question or "country" in normalized_question:
+        return _build_country_answer(chunks)
+    if normalized_question in {"revenue", "margin", "cost", "asp", "smb", "gross margin"}:
+        return _build_definition_answer(question, chunks)
+    if any(pattern in normalized_question for pattern in ["que signifie", "definition"]):
+        return _build_definition_answer(question, chunks)
+    if any(pattern in normalized_question for pattern in ["comment calcule", "formule", "calcule t on"]):
+        return _build_formula_answer(chunks)
+    return _build_generic_answer(chunks)
 
 
 def _score_chunk(question_tokens: set[str], chunk: dict, intent: str) -> int:
@@ -483,3 +513,12 @@ def _find_chunk_with_percent(chunks: list[dict], title_keyword: str) -> dict | N
         if title_keyword in raw_title and "%" in raw_title:
             return chunk
     return None
+
+
+def _looks_reasonably_french(text: str) -> bool:
+    normalized = f" {text.lower()} "
+    french_cues = [" le ", " la ", " les ", " des ", " une ", " un ", " pour ", " avec ", " d'", " en "]
+    english_cues = [" the ", " and ", " is ", " are ", " sales ", " generated ", " higher ", " business "]
+    french_score = sum(1 for cue in french_cues if cue in normalized)
+    english_score = sum(1 for cue in english_cues if cue in normalized)
+    return french_score >= english_score

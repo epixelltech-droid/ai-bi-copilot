@@ -7,6 +7,9 @@ SYSTEM = '''
 You are a senior BI analyst. Answer in French.
 Use only the supplied rows and context.
 Give the key business insight and never invent a cause.
+Rewrite the local insight in a concise, natural, business-friendly style.
+French only. Do not answer in English.
+Keep it strictly grounded in the provided data.
 '''
 
 
@@ -14,15 +17,27 @@ def build_insight(question: str, rows: list[dict], context: list[dict]) -> str:
     if not rows:
         return "Aucune donnee ne correspond a la requete."
 
+    local_answer = _build_local_insight(question, rows, context)
     prompt = json.dumps(
-        {"question": question, "rows": rows[:30], "context": context},
+        {
+            "question": question,
+            "rows": rows[:30],
+            "context": context[:10],
+            "local_answer": local_answer,
+        },
         ensure_ascii=False,
         default=str,
     )
     result = llm_text(SYSTEM, prompt)
     if result:
-        return result
+        cleaned = result.strip()
+        if cleaned and _looks_reasonably_french(cleaned):
+            return cleaned
 
+    return local_answer
+
+
+def _build_local_insight(question: str, rows: list[dict], context: list[dict]) -> str:
     first = rows[0]
     year = _extract_year(question)
 
@@ -170,3 +185,12 @@ def _extract_year(question: str) -> int | None:
 def _format_number(value: float | int) -> str:
     formatted = f"{value:,.2f}"
     return formatted.replace(",", " ").replace(".", ",")
+
+
+def _looks_reasonably_french(text: str) -> bool:
+    normalized = f" {text.lower()} "
+    french_cues = [" le ", " la ", " les ", " des ", " une ", " un ", " pour ", " avec ", " d'", " en "]
+    english_cues = [" the ", " and ", " is ", " are ", " sales ", " generated ", " higher ", " business "]
+    french_score = sum(1 for cue in french_cues if cue in normalized)
+    english_score = sum(1 for cue in english_cues if cue in normalized)
+    return french_score >= english_score

@@ -1,6 +1,32 @@
 from app.agents.insight_agent import build_insight
 
 
+def test_llm_rewrite_is_used_when_available(monkeypatch):
+    monkeypatch.setattr(
+        "app.agents.insight_agent.llm_text",
+        lambda *args, **kwargs: "Le Maroc est en tete.",
+    )
+
+    answer = build_insight(
+        "Quel est le chiffre d'affaires par pays ?",
+        [{"country": "Maroc", "revenue": 100.0}],
+        [],
+    )
+
+    assert answer == "Le Maroc est en tete."
+
+
+def test_llm_english_reply_falls_back_to_local_answer(monkeypatch):
+    monkeypatch.setattr(
+        "app.agents.insight_agent.llm_text",
+        lambda *args, **kwargs: "The total revenue is 100.",
+    )
+
+    answer = build_insight("Quel est le chiffre d'affaires total ?", [{"revenue": 100.0}], [])
+
+    assert "Le chiffre d'affaires total est de 100,00." == answer
+
+
 def test_total_revenue_insight(monkeypatch):
     monkeypatch.setattr("app.agents.insight_agent.llm_text", lambda *args, **kwargs: None)
     answer = build_insight("Quel est le chiffre d'affaires total ?", [{"revenue": 6044707.25}], [])

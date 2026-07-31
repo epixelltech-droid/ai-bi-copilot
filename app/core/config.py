@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     max_rows: int = 200
 
     openai_api_key: str = ""
-    openai_model: str = ""
+    openai_model: str = "gpt-4o-mini"
 
     azure_openai_endpoint: str = ""
     azure_openai_api_key: str = ""
