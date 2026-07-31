@@ -1,11 +1,15 @@
 from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     app_env: str = "dev"
     demo_mode: bool = True
     sqlite_path: str = "data/demo.db"
     max_rows: int = 200
+
+    openai_api_key: str = ""
+    openai_model: str = ""
 
     azure_openai_endpoint: str = ""
     azure_openai_api_key: str = ""

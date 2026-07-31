@@ -4,7 +4,7 @@ from langgraph.graph import END, START, StateGraph
 
 from app.agents.dax_agent import generate_dax
 from app.agents.insight_agent import build_insight
-from app.agents.router import route_question
+from app.agents.router import analyze_question
 from app.agents.sql_agent import generate_sql
 from app.connectors.powerbi import execute_dax
 from app.connectors.sqlite_demo import execute_demo_sql
@@ -27,7 +27,11 @@ class CopilotState(TypedDict, total=False):
 
 
 def router_node(state):
-    return {"route": route_question(state["question"], state.get("preferred_source", "auto"))}
+    analysis = analyze_question(state["question"], state.get("preferred_source", "auto"))
+    return {
+        "route": analysis["route"],
+        "question": analysis["rewritten_question"],
+    }
 
 
 def rag_node(state):

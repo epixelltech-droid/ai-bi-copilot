@@ -9,6 +9,41 @@ def run_local_sql(question: str, monkeypatch):
     return query, rows
 
 
+def test_llm_sql_can_be_used_when_valid(monkeypatch):
+    monkeypatch.setattr(
+        sql_agent,
+        "llm_text",
+        lambda *args, **kwargs: """
+SELECT
+    c.country,
+    ROUND(SUM(f.revenue), 2) AS revenue
+FROM fact_sales f
+JOIN dim_customer c
+    ON f.customer_id = c.customer_id
+GROUP BY c.country
+ORDER BY revenue DESC
+""".strip(),
+    )
+
+    query = sql_agent.generate_sql("Montre moi le chiffre d'affaires par pays client")
+    rows = execute_demo_sql(query)
+
+    assert "JOIN dim_customer c" in query
+    assert "SUM(f.revenue)" in query
+    assert rows
+
+
+def test_llm_sql_falls_back_to_deterministic_query_when_invalid(monkeypatch):
+    monkeypatch.setattr(sql_agent, "llm_text", lambda *args, **kwargs: "DROP TABLE fact_sales")
+
+    query = sql_agent.generate_sql("Quel est le chiffre d'affaires par pays ?")
+    rows = execute_demo_sql(query)
+
+    assert "DROP TABLE" not in query
+    assert "JOIN dim_customer c" in query
+    assert rows
+
+
 def test_total_revenue_query_uses_fact_sales(monkeypatch):
     query, rows = run_local_sql("Quel est le chiffre d'affaires total ?", monkeypatch)
 

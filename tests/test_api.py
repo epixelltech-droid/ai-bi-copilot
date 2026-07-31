@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 
 import app.agents.dax_agent as dax_agent
 import app.agents.insight_agent as insight_agent
+import app.agents.router as router_agent
 import app.agents.sql_agent as sql_agent
 import app.core.audit as audit_module
 from app.main import app
@@ -66,6 +67,34 @@ def test_chat_sql_mode(client):
     assert body["visualization"]["kind"] == "bar"
     assert body["visualization"]["figure"]
     assert body["audit_id"]
+
+
+def test_chat_sql_mode_uses_llm_router_rewrite_when_available(client, monkeypatch):
+    monkeypatch.setattr(
+        router_agent,
+        "llm_json",
+        lambda *args, **kwargs: {
+            "route": "sql",
+            "rewritten_question": "Quel est le chiffre d'affaires par pays ?",
+            "reason": "normalized for analytics",
+        },
+    )
+
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Montre moi le CA cote pays stp",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert "JOIN dim_customer c" in body["artifact"]["query"]
+    assert body["data"]
 
 
 def test_chat_rag_mode(client):

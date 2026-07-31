@@ -10,6 +10,7 @@ Generate ONE read-only SQLite query.
 Use only the supplied tables, columns, and relations.
 Use the provided joins when a dimension is needed.
 Never use INSERT, UPDATE, DELETE, DROP, ALTER, EXEC or CREATE.
+Prefer short, explicit SQLite queries with the correct GROUP BY, ORDER BY and LIMIT when useful.
 Return SQL only.
 '''
 
@@ -548,8 +549,21 @@ LIMIT 20
 
 
 def generate_sql(question: str) -> str:
+    deterministic_query = deterministic_sql(question)
     schema_text = format_schema_for_llm()
-    prompt = f"SCHEMA:\n{schema_text}\n\nQUESTION:\n{question}"
-    query = llm_text(SYSTEM, prompt) or deterministic_sql(question)
-    query = query.replace("```sql", "").replace("```", "").strip()
-    return validate_readonly_sql(query)
+    prompt = (
+        f"SCHEMA:\n{schema_text}\n\n"
+        f"QUESTION:\n{question}\n\n"
+        f"DETERMINISTIC_BASELINE:\n{deterministic_query}\n\n"
+        "Return a better SQL query only if needed. "
+        "If the baseline is already correct, you may return it unchanged."
+    )
+    query = llm_text(SYSTEM, prompt)
+    if query:
+        cleaned_query = query.replace("```sql", "").replace("```", "").strip()
+        try:
+            return validate_readonly_sql(cleaned_query)
+        except ValueError:
+            pass
+
+    return validate_readonly_sql(deterministic_query)

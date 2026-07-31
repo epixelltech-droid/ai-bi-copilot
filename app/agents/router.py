@@ -1,5 +1,26 @@
 import unicodedata
 
+from app.core.llm import llm_json
+
+ROUTES = {"sql", "rag", "powerbi"}
+
+ROUTER_SYSTEM = """
+You are the routing layer of a BI copilot.
+Choose exactly one route:
+- sql: analytical question about metrics, dimensions, filters, ranking, trend, comparison, totals
+- rag: documentary question about KPI definitions, business rules, data dictionary, terminology
+- powerbi: explicit DAX / Power BI modeling request
+
+Return strict JSON only with:
+{
+  "route": "sql|rag|powerbi",
+  "rewritten_question": "clear canonical rewrite in French",
+  "reason": "short reason"
+}
+
+The rewritten question must preserve the user's intent and help downstream SQL generation.
+""".strip()
+
 
 def normalize_question(question: str) -> str:
     normalized = unicodedata.normalize("NFKD", question.lower())
@@ -115,10 +136,7 @@ def is_analytical_question(normalized_question: str) -> bool:
     return contains_any(normalized_question, analytical_patterns)
 
 
-def route_question(question: str, preferred: str = "auto") -> str:
-    if preferred != "auto":
-        return preferred
-
+def _deterministic_route(question: str) -> str:
     q = normalize_question(question)
 
     if is_powerbi_question(q):
@@ -131,3 +149,34 @@ def route_question(question: str, preferred: str = "auto") -> str:
         return "sql"
 
     return "sql"
+
+
+def analyze_question(question: str, preferred: str = "auto") -> dict[str, str]:
+    if preferred != "auto":
+        return {
+            "route": preferred,
+            "rewritten_question": question,
+            "reason": "preferred source",
+        }
+
+    llm_result = llm_json(ROUTER_SYSTEM, question)
+    if llm_result:
+        route = str(llm_result.get("route", "")).strip().lower()
+        rewritten_question = str(llm_result.get("rewritten_question", "")).strip() or question
+        reason = str(llm_result.get("reason", "")).strip() or "llm route"
+        if route in ROUTES:
+            return {
+                "route": route,
+                "rewritten_question": rewritten_question,
+                "reason": reason,
+            }
+
+    return {
+        "route": _deterministic_route(question),
+        "rewritten_question": question,
+        "reason": "deterministic fallback",
+    }
+
+
+def route_question(question: str, preferred: str = "auto") -> str:
+    return analyze_question(question, preferred)["route"]
