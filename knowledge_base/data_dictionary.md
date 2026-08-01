@@ -44,6 +44,10 @@ Enterprise represents larger customer accounts. Enterprise analysis is useful fo
 
 Country always comes from `dim_customer.country`. In this model, a country analysis means the country of the customer, not the product and not the warehouse.
 
+When a user asks for revenue, margin, ASP, or quantity by segment, the analysis should join `fact_sales` with `dim_customer`.
+
+When a user asks for performance by country, the country is always interpreted as the customer country.
+
 ## TABLE dim_product
 
 - `product_id`: unique product identifier.
@@ -65,6 +69,8 @@ Office contains workplace and office supply products.
 
 Accessories contains add-on products and smaller complementary items.
 
+When a user asks for revenue, margin, margin %, ASP, or quantity by category, the analysis should join `fact_sales` with `dim_product`.
+
 ## TABLE dim_date
 
 - `date_id`: date key in `YYYYMMDD` numeric format.
@@ -84,5 +90,8 @@ Accessories contains add-on products and smaller complementary items.
 These relationships allow BI queries such as:
 - revenue by country
 - margin by category
+- margin % by segment
+- average selling price by country
+- revenue share by country
 - revenue by month
 - top customers

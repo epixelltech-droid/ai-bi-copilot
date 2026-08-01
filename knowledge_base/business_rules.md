@@ -22,7 +22,11 @@ Margin is calculated as:
 
 Margin % is calculated as:
 
-`Margin % = Margin / Revenue`
+`Margin % = Margin / Revenue x 100`
+
+When Margin % is calculated on grouped data, use aggregated values:
+
+`Margin % = SUM(Margin) / SUM(Revenue) x 100`
 
 ## 5. Top customer
 
@@ -64,6 +68,10 @@ Average Selling Price is calculated as:
 
 `Average Selling Price = Revenue / Quantity`
 
+When ASP is calculated on grouped data, use aggregated values:
+
+`Average Selling Price = SUM(Revenue) / SUM(Quantity)`
+
 ASP is the abbreviation of Average Selling Price.
 
 ## 12. Gross Margin
@@ -85,3 +93,21 @@ The available customer segments are Enterprise, SMB, and Retail.
 Category analysis uses `dim_product.category`.
 
 The available product categories are IT, Office, and Accessories.
+
+## 15. Revenue share
+
+Revenue share measures contribution to total revenue.
+
+`Revenue Share % = Group Revenue / Total Revenue x 100`
+
+Revenue share can be used by country, segment, category, product, or customer.
+
+## 16. Evolution over time
+
+Evolution means comparing the same KPI across dates or periods.
+
+Yearly evolution uses `dim_date.year`.
+
+Monthly evolution uses `dim_date.year`, `dim_date.month`, and `dim_date.month_name`.
+
+The system can describe an increase or decrease, but it must not invent a business cause without supporting data.

@@ -10,6 +10,7 @@ class Settings(BaseSettings):
 
     openai_api_key: str = ""
     openai_model: str = "gpt-4o-mini"
+    hybrid_llm_enabled: bool = False
 
     azure_openai_endpoint: str = ""
     azure_openai_api_key: str = ""

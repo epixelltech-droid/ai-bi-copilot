@@ -55,6 +55,18 @@ def _build_figure(
                     )
                 ]
             )
+        elif kind == "horizontal_bar":
+            figure = go.Figure(
+                data=[
+                    go.Bar(
+                        x=values,
+                        y=labels,
+                        orientation="h",
+                        marker={"color": "#44d5b2"},
+                        hovertemplate="%{y}<br>%{x:,.2f}<extra></extra>",
+                    )
+                ]
+            )
         else:
             figure = go.Figure(
                 data=[
@@ -90,6 +102,15 @@ def _manual_trace(kind: str, labels: list[Any], values: list[Any]) -> dict[str, 
             "marker": {"color": "#f1aa6b", "size": 7},
             "hovertemplate": "%{x}<br>%{y:,.2f}<extra></extra>",
         }
+    if kind == "horizontal_bar":
+        return {
+            "type": "bar",
+            "orientation": "h",
+            "x": values,
+            "y": labels,
+            "marker": {"color": "#44d5b2"},
+            "hovertemplate": "%{y}<br>%{x:,.2f}<extra></extra>",
+        }
     return {
         "type": "bar",
         "x": labels,
@@ -106,7 +127,7 @@ def _layout(
     kind: str,
     labels: list[Any],
 ) -> dict[str, Any]:
-    return {
+    layout = {
         "title": {"text": title},
         "paper_bgcolor": "rgba(0,0,0,0)",
         "plot_bgcolor": "rgba(0,0,0,0)",
@@ -122,6 +143,12 @@ def _layout(
             "gridcolor": "rgba(255,255,255,0.08)",
         },
     }
+    if kind == "horizontal_bar":
+        layout["xaxis"]["title"]["text"] = _humanize(metric_column)
+        layout["yaxis"]["title"]["text"] = _humanize(label_column)
+        layout["yaxis"]["autorange"] = "reversed"
+        layout["margin"] = {"l": 120, "r": 18, "t": 52, "b": 42}
+    return layout
 
 
 def _config() -> dict[str, Any]:
@@ -143,6 +170,9 @@ def _detect_shape(rows: list[dict[str, Any]]) -> tuple[str, str] | None:
         for column in columns
         if all(not _is_number(row.get(column)) for row in rows)
     ]
+    for semantic_label in ["month_name", "full_date", "year", "month"]:
+        if semantic_label in columns and semantic_label not in label_columns:
+            label_columns.append(semantic_label)
 
     if not numeric_columns or not label_columns:
         return None
@@ -159,10 +189,12 @@ def _preferred_metric(columns: list[str]) -> str:
 
 def _chart_kind(question: str, label_column: str) -> str:
     normalized = _normalize(question)
-    if label_column in {"month_name", "month", "full_date"}:
+    if label_column in {"month_name", "month", "full_date", "year"}:
         return "line"
     if any(word in normalized for word in ["mois", "mensuel", "monthly", "month"]):
         return "line"
+    if any(word in normalized for word in ["top", "meilleur", "meilleurs", "classement"]):
+        return "horizontal_bar"
     return "bar"
 
 
@@ -171,16 +203,21 @@ def _chart_title(question: str, label_column: str, metric_column: str) -> str:
     metric = _humanize(metric_column)
     label = _humanize(label_column)
     if "top" in normalized:
-        return f"Top {label} by {metric}"
+        return f"Top {label} par {metric}"
     if any(word in normalized for word in ["mois", "mensuel", "monthly", "month"]):
-        return f"{metric} by month"
-    return f"{metric} by {label}"
+        return f"{metric} par mois"
+    if any(word in normalized for word in ["evolution", "variation", "croissance"]):
+        return f"Evolution de {metric}"
+    return f"{metric} par {label}"
 
 
 def _sort_rows(rows: list[dict[str, Any]], metric_column: str, kind: str) -> list[dict[str, Any]]:
     if kind == "line":
         return rows
-    return sorted(rows, key=lambda row: row.get(metric_column) or 0, reverse=True)
+    sorted_rows = sorted(rows, key=lambda row: row.get(metric_column) or 0, reverse=True)
+    if kind == "horizontal_bar":
+        return sorted_rows[:10]
+    return sorted_rows
 
 
 def _is_number(value: Any) -> bool:

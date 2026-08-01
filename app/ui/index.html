@@ -977,6 +977,9 @@
           <div class="presets-group">
             <button class="preset-chip" data-q="Quel est le chiffre d'affaires par pays ?">CA par pays</button>
             <button class="preset-chip" data-q="Quel est le top 5 des produits en quantite ?">Top 5 produits</button>
+            <button class="preset-chip" data-q="Quelle est la marge % par categorie ?">Marge %</button>
+            <button class="preset-chip" data-q="Quel est l'ASP par pays ?">ASP par pays</button>
+            <button class="preset-chip" data-q="Quelle est l'evolution du chiffre d'affaires par an ?">Evolution</button>
             <button class="preset-chip" data-q="Comment calcule-t-on l'ASP ?">Formule ASP</button>
           </div>
 
@@ -1246,7 +1249,7 @@
       const columns = Object.keys(visibleRows[0]);
       const ths = columns.map((column) => {
         const isSorted = currentSort.column === column;
-        const indicator = isSorted ? (currentSort.direction === "asc" ? "↑" : "↓") : "";
+        const indicator = isSorted ? (currentSort.direction === "asc" ? "ASC" : "DESC") : "";
         return `<th data-column="${escapeHtml(column)}"><span class="th-label">${escapeHtml(column)}<span class="sort-indicator">${indicator}</span></span></th>`;
       }).join("");
       const trs = visibleRows.map((row) => {

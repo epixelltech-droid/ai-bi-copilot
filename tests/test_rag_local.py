@@ -287,3 +287,19 @@ def test_short_cost_question_is_understood():
 
     assert "Cost" in result["answer"]
     assert "Quantity x Unit Cost" in result["answer"]
+
+
+def test_answer_revenue_share_contains_contribution_definition():
+    chunks = retrieve("Que signifie revenue share ?", k=3)
+    result = answer_from_context("Que signifie revenue share ?", chunks)
+
+    assert "Revenue Share" in result["answer"]
+    assert "Group Revenue / Total Revenue" in result["answer"]
+
+
+def test_answer_evolution_over_time_is_safe():
+    chunks = retrieve("Comment lire une evolution annuelle ?", k=3)
+    result = answer_from_context("Comment lire une evolution annuelle ?", chunks)
+
+    assert "Year-over-Year Change" in result["answer"]
+    assert "Current Year KPI" in result["answer"]

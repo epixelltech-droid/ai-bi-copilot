@@ -108,3 +108,15 @@ def test_business_rules_question_routes_to_rag():
 
 def test_january_2026_sales_question_routes_to_sql():
     assert router.route_question("Affiche les ventes de janvier 2026") == "sql"
+
+
+def test_margin_percent_by_category_routes_to_sql():
+    assert router.route_question("Quelle est la marge % par categorie ?") == "sql"
+
+
+def test_asp_by_country_routes_to_sql():
+    assert router.route_question("Quel est l'ASP par pays ?") == "sql"
+
+
+def test_revenue_evolution_routes_to_sql():
+    assert router.route_question("Quelle est l'evolution du chiffre d'affaires par an ?") == "sql"

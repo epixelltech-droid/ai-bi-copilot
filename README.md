@@ -362,9 +362,28 @@ This makes the project easy to understand, test, and demonstrate.
 - `docs/ROADMAP.md`
 - `docs/DEMO_SCRIPT.md`
 - `docs/DEMO_WALKTHROUGH.md`
+- `docs/DEPLOYMENT.md`
+- `docs/IMPROVEMENT_BATCH.md`
 - `docs/PRODUCT_NEXT_STEPS.md`
 - `docs/V2_SCOPE.md`
 - `CHANGELOG.md`
+
+## Optional Hybrid Mode
+
+The application can use OpenAI as an optional helper for routing, SQL generation, RAG synthesis, and insight wording.
+
+To avoid accidental cost, the hybrid LLM mode is disabled by default. Enable it explicitly in `.env`:
+
+```text
+HYBRID_LLM_ENABLED=true
+OPENAI_MODEL=gpt-4o-mini
+```
+
+Keep `OPENAI_API_KEY` only in your local `.env`. Never commit secrets.
+
+## Docker Demo
+
+See `docs/DEPLOYMENT.md` for Docker instructions.
 
 ## What Makes It Interesting
 
@@ -388,7 +407,7 @@ Current state:
 - RAG path working
 - local UI working
 - short memory and history working
-- `151` automated tests passing
+- `187` automated tests passing
 - GitHub repository initialized and updated
 
 ## Notes

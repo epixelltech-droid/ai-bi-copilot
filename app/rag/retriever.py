@@ -34,6 +34,8 @@ TOKEN_EXPANSIONS = {
     "ca": ["revenue", "chiffre", "affaires"],
     "chiffre": ["revenue"],
     "affaires": ["revenue"],
+    "ventes": ["revenue", "sales"],
+    "sales": ["revenue"],
     "revenu": ["revenue"],
     "revenus": ["revenue"],
     "cout": ["cost"],
@@ -52,6 +54,13 @@ TOKEN_EXPANSIONS = {
     "pays": ["country"],
     "country": ["pays"],
     "segment": ["enterprise", "smb", "retail"],
+    "taux": ["percent", "pct"],
+    "pourcentage": ["percent", "pct"],
+    "part": ["share", "contribution"],
+    "contribution": ["share"],
+    "evolution": ["change", "year", "trend"],
+    "variation": ["change", "evolution"],
+    "croissance": ["growth", "evolution"],
     "mensuel": ["month"],
     "mois": ["month", "month_name"],
     "regle": ["rules"],
@@ -75,9 +84,9 @@ TOKEN_EXPANSIONS = {
 }
 
 IMPORTANT_TOKENS = {
-    "asp", "average", "business", "category", "cost", "country", "customer",
+    "asp", "average", "business", "category", "change", "cost", "country", "customer",
     "enterprise", "gross", "margin", "price", "product", "quantity", "retail",
-    "revenue", "rules", "segment", "smb", "top",
+    "revenue", "rules", "segment", "share", "smb", "top",
 }
 
 INTENT_TOKENS = {
@@ -153,6 +162,12 @@ def answer_from_context(question: str, chunks: list[dict]) -> dict:
 def _build_local_answer(question: str, chunks: list[dict], normalized_question: str) -> str:
     if "margin" in normalized_question and "%" in question:
         return _build_definition_answer(question, chunks)
+    if "taux de marge" in normalized_question:
+        return _build_definition_answer("Margin %", chunks)
+    if "revenue share" in normalized_question or "part du" in normalized_question or "contribution" in normalized_question:
+        return _build_definition_answer("Revenue Share %", chunks)
+    if "evolution" in normalized_question or "variation" in normalized_question or "croissance" in normalized_question:
+        return _build_definition_answer("Year-over-Year Change", chunks)
     if "difference entre" in normalized_question:
         return _build_difference_answer(question, chunks)
     if "gross margin" in normalized_question:
@@ -178,7 +193,7 @@ def _build_local_answer(question: str, chunks: list[dict], normalized_question: 
     if any(pattern in normalized_question for pattern in ["que signifie", "definition"]):
         return _build_definition_answer(question, chunks)
     if any(pattern in normalized_question for pattern in ["comment calcule", "formule", "calcule t on"]):
-        return _build_formula_answer(chunks)
+        return _build_definition_answer(question, chunks)
     return _build_generic_answer(chunks)
 
 
@@ -371,6 +386,7 @@ def _build_country_answer(chunks: list[dict]) -> str:
 
 
 def _build_line_answer(chunks: list[dict], keyword: str) -> str:
+    chunks = _merge_chunks(chunks, chunk_documents(load_markdown_documents()))
     all_matching_lines = []
     for chunk in chunks:
         text = _strip_markdown(chunk["text"])
@@ -434,6 +450,10 @@ def _find_best_matching_chunk(question: str, chunks: list[dict]) -> dict | None:
     normalized_question = _normalize_text(question)
     if "asp" in normalized_question or "average selling price" in normalized_question:
         return _find_chunk_by_title(chunks, "average selling price")
+    if "revenue share" in normalized_question or "part du" in normalized_question or "contribution" in normalized_question:
+        return _find_chunk_by_title(chunks, "revenue share %")
+    if "year over year" in normalized_question or "evolution" in normalized_question or "variation" in normalized_question:
+        return _find_chunk_by_title(chunks, "year-over-year change")
     if "margin" in normalized_question and "%" in question:
         return _find_chunk_with_percent(chunks, "margin")
     if "gross margin" in normalized_question:

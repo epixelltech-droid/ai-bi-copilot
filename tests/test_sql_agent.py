@@ -382,3 +382,45 @@ def test_sales_for_january_2025_use_month_and_year(monkeypatch):
     assert "AND d.month = 1" in query
     assert rows
     assert "full_date" in rows[0]
+
+
+def test_margin_percent_by_category_uses_grouped_margin_rate(monkeypatch):
+    query, rows = run_local_sql("Quelle est la marge % par categorie ?", monkeypatch)
+
+    assert "JOIN dim_product p" in query
+    assert "SUM(f.margin) * 100.0 / NULLIF(SUM(f.revenue), 0)" in query
+    assert "margin_pct" in query
+    assert rows
+    assert "category" in rows[0]
+    assert "margin_pct" in rows[0]
+
+
+def test_asp_by_country_uses_revenue_over_quantity(monkeypatch):
+    query, rows = run_local_sql("Quel est l'ASP par pays ?", monkeypatch)
+
+    assert "JOIN dim_customer c" in query
+    assert "SUM(f.revenue) / NULLIF(SUM(f.quantity), 0)" in query
+    assert "average_selling_price" in query
+    assert rows
+    assert "country" in rows[0]
+    assert "average_selling_price" in rows[0]
+
+
+def test_revenue_share_by_country_uses_window_total(monkeypatch):
+    query, rows = run_local_sql("Quelle est la part du chiffre d'affaires par pays ?", monkeypatch)
+
+    assert "JOIN dim_customer c" in query
+    assert "SUM(SUM(f.revenue)) OVER ()" in query
+    assert "revenue_share_pct" in query
+    assert rows
+    assert "country" in rows[0]
+    assert "revenue_share_pct" in rows[0]
+
+
+def test_revenue_evolution_by_year_uses_date_dimension(monkeypatch):
+    query, rows = run_local_sql("Quelle est l'evolution du chiffre d'affaires par an ?", monkeypatch)
+
+    assert "JOIN dim_date d" in query
+    assert "GROUP BY d.year" in query
+    assert rows
+    assert {row["year"] for row in rows} == {2025, 2026}

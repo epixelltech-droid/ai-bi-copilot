@@ -886,3 +886,62 @@ def test_chat_sql_margin_for_2026_mode(client):
     assert "SUM(f.margin)" in body["artifact"]["query"]
     assert body["data"]
     assert body["answer"]
+
+
+def test_chat_sql_margin_percent_by_category_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quelle est la marge % par categorie ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert "JOIN dim_product p" in body["artifact"]["query"]
+    assert "margin_pct" in body["artifact"]["query"]
+    assert body["data"]
+    assert body["visualization"]["enabled"] is True
+
+
+def test_chat_sql_asp_by_country_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est l'ASP par pays ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert "JOIN dim_customer c" in body["artifact"]["query"]
+    assert "average_selling_price" in body["artifact"]["query"]
+    assert body["data"]
+    assert "prix de vente moyen" in body["answer"]
+
+
+def test_chat_sql_revenue_evolution_by_year_mode(client):
+    response = client.post(
+        "/api/chat",
+        json={
+            "question": "Quelle est l'evolution du chiffre d'affaires par an ?",
+            "user_id": "test-user",
+            "source": "auto",
+        },
+    )
+
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body["route"] == "sql"
+    assert "JOIN dim_date d" in body["artifact"]["query"]
+    assert body["visualization"]["kind"] == "line"
+    assert {row["year"] for row in body["data"]} == {2025, 2026}

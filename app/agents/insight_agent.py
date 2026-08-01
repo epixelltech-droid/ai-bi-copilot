@@ -60,6 +60,9 @@ def _build_local_insight(question: str, rows: list[dict], context: list[dict]) -
     if len(rows) == 1 and "margin" in first and len(first.keys()) == 1:
         return f"La marge totale est de {_format_number(first['margin'])}."
 
+    if len(rows) == 1 and "average_selling_price" in first and len(first.keys()) == 1:
+        return f"Le prix de vente moyen est de {_format_number(first['average_selling_price'])}."
+
     if "country" in first and "revenue" in first and len(rows) == 2:
         return _build_country_comparison_insight(rows, "revenue", year)
 
@@ -72,11 +75,26 @@ def _build_local_insight(question: str, rows: list[dict], context: list[dict]) -
     if "country" in first and "margin" in first:
         return _build_ranking_insight(rows, "country", "margin", "Le pays", year)
 
+    if "country" in first and "margin_pct" in first:
+        return _build_ranking_insight(rows, "country", "margin_pct", "Le pays", year)
+
+    if "country" in first and "average_selling_price" in first:
+        return _build_ranking_insight(rows, "country", "average_selling_price", "Le pays", year)
+
+    if "country" in first and "revenue_share_pct" in first:
+        return _build_ranking_insight(rows, "country", "revenue_share_pct", "Le pays", year)
+
     if "segment" in first and "revenue" in first:
         return _build_ranking_insight(rows, "segment", "revenue", "Le segment", year)
 
     if "segment" in first and "margin" in first:
         return _build_ranking_insight(rows, "segment", "margin", "Le segment", year)
+
+    if "segment" in first and "margin_pct" in first:
+        return _build_ranking_insight(rows, "segment", "margin_pct", "Le segment", year)
+
+    if "segment" in first and "average_selling_price" in first:
+        return _build_ranking_insight(rows, "segment", "average_selling_price", "Le segment", year)
 
     if "product_name" in first and "quantity" in first:
         return _build_ranking_insight(rows, "product_name", "quantity", "Le produit", year)
@@ -96,11 +114,23 @@ def _build_local_insight(question: str, rows: list[dict], context: list[dict]) -
     if "category" in first and "margin" in first:
         return _build_ranking_insight(rows, "category", "margin", "La categorie", year)
 
+    if "category" in first and "margin_pct" in first:
+        return _build_ranking_insight(rows, "category", "margin_pct", "La categorie", year)
+
+    if "category" in first and "average_selling_price" in first:
+        return _build_ranking_insight(rows, "category", "average_selling_price", "La categorie", year)
+
     if "year" in first and "month" in first and "revenue" in first:
         return _build_time_insight(rows, "revenue")
 
     if "year" in first and "month" in first and "margin" in first:
         return _build_time_insight(rows, "margin")
+
+    if "year" in first and "revenue" in first and len(rows) >= 2:
+        return _build_year_comparison_insight(rows, "revenue")
+
+    if "year" in first and "margin" in first and len(rows) >= 2:
+        return _build_year_comparison_insight(rows, "margin")
 
     if "year" in first and "revenue" in first:
         return _build_year_insight(rows, "revenue")
@@ -165,6 +195,21 @@ def _build_year_insight(rows: list[dict], metric_key: str) -> str:
     )
 
 
+def _build_year_comparison_insight(rows: list[dict], metric_key: str) -> str:
+    ordered_rows = sorted(rows, key=lambda row: row["year"])
+    first = ordered_rows[0]
+    last = ordered_rows[-1]
+    delta = last[metric_key] - first[metric_key]
+    direction = "augmente" if delta >= 0 else "diminue"
+    metric_label = _metric_label(metric_key)
+    article = "La" if metric_key == "margin" else "Le"
+    return (
+        f"{article} {metric_label} {direction} entre {first['year']} et {last['year']} : "
+        f"{_format_number(first[metric_key])} contre {_format_number(last[metric_key])}, "
+        f"soit un ecart de {_format_number(abs(delta))}."
+    )
+
+
 def _build_country_comparison_insight(rows: list[dict], metric_key: str, year: int | None = None) -> str:
     ordered_rows = sorted(rows, key=lambda row: row[metric_key], reverse=True)
     leader = ordered_rows[0]
@@ -185,6 +230,12 @@ def _metric_label(metric_key: str) -> str:
         return "chiffre d'affaires"
     if metric_key == "margin":
         return "marge"
+    if metric_key == "margin_pct":
+        return "taux de marge"
+    if metric_key == "average_selling_price":
+        return "prix de vente moyen"
+    if metric_key == "revenue_share_pct":
+        return "part du chiffre d'affaires"
     return "quantite"
 
 

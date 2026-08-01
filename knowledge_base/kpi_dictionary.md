@@ -46,6 +46,10 @@ Formula: `Margin % = Margin / Revenue x 100`
 
 Interpretation: Margin % helps compare profitability across countries, products, or customer segments even when revenue levels are different.
 
+Also known as: margin rate, gross margin rate, taux de marge.
+
+Use case: Margin % is useful when two groups have different revenue sizes and the business wants to compare profitability quality instead of absolute margin amount.
+
 ## Quantity
 
 Definition: Quantity is the number of units sold in a transaction or across a group of transactions.
@@ -63,3 +67,19 @@ Interpretation: This KPI helps identify pricing level, discount effect, or mix e
 Also known as: ASP.
 
 Use case: ASP is useful when the business wants to understand whether revenue is driven by higher prices or by higher quantities.
+
+## Revenue Share %
+
+Definition: Revenue Share % is the percentage of total revenue represented by one country, product, customer, segment, or category.
+
+Formula: `Revenue Share % = Group Revenue / Total Revenue x 100`
+
+Interpretation: Revenue Share % helps understand contribution. A high share means the group represents an important part of total business revenue.
+
+## Year-over-Year Change
+
+Definition: Year-over-Year Change compares the same KPI between two years.
+
+Formula: `Year-over-Year Change = Current Year KPI - Previous Year KPI`
+
+Interpretation: This KPI helps read evolution over time. It shows the size of the change but does not explain the cause by itself.

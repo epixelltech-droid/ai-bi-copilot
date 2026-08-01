@@ -30,6 +30,33 @@ def test_builds_line_chart_for_monthly_revenue():
     assert visualization["figure"]["data"][0]["mode"] == "lines+markers"
 
 
+def test_builds_horizontal_bar_for_top_question():
+    rows = [
+        {"product_name": "A", "revenue": 100.0},
+        {"product_name": "B", "revenue": 200.0},
+    ]
+
+    visualization = build_visualization("Quel est le top 5 des produits ?", rows)
+
+    assert visualization["enabled"] is True
+    assert visualization["kind"] == "horizontal_bar"
+    assert visualization["figure"]["data"][0]["type"] == "bar"
+    assert visualization["figure"]["data"][0]["orientation"] == "h"
+
+
+def test_builds_line_chart_for_yearly_evolution():
+    rows = [
+        {"year": 2025, "revenue": 100.0},
+        {"year": 2026, "revenue": 150.0},
+    ]
+
+    visualization = build_visualization("Evolution du chiffre d'affaires par an", rows)
+
+    assert visualization["enabled"] is True
+    assert visualization["kind"] == "line"
+    assert visualization["figure"]["data"][0]["x"] == [2025, 2026]
+
+
 def test_does_not_build_chart_for_empty_or_unshaped_rows():
     assert build_visualization("Question", [])["enabled"] is False
     assert build_visualization("Question", [{"revenue": 100.0}])["enabled"] is False

@@ -1,0 +1,12 @@
+.git
+.venv
+__pycache__
+.pytest_cache
+*.pyc
+.env
+data/*.jsonl
+data/*.db
+docs/assets/*.png
+docs/assets/*.jpg
+docs/assets/*.jpeg
+docs/assets/*.webp

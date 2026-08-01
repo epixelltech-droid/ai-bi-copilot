@@ -17,6 +17,9 @@ def _strip_code_fences(text: str) -> str:
 def get_llm_client() -> tuple[OpenAI, str] | None:
     settings = get_settings()
 
+    if not settings.hybrid_llm_enabled:
+        return None
+
     if settings.openai_api_key and settings.openai_model:
         return OpenAI(api_key=settings.openai_api_key), settings.openai_model
 
@@ -41,6 +44,7 @@ def get_llm_runtime_info() -> dict[str, str | bool]:
             "provider": "openai",
             "model": settings.openai_model,
             "configured": True,
+            "enabled": settings.hybrid_llm_enabled,
         }
 
     if (
@@ -52,12 +56,14 @@ def get_llm_runtime_info() -> dict[str, str | bool]:
             "provider": "azure_openai",
             "model": settings.azure_openai_deployment,
             "configured": True,
+            "enabled": settings.hybrid_llm_enabled,
         }
 
     return {
         "provider": "none",
         "model": "",
         "configured": False,
+        "enabled": settings.hybrid_llm_enabled,
     }
 
 

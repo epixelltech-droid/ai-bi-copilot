@@ -195,3 +195,45 @@ def test_enterprise_top_customers_insight(monkeypatch):
     assert "Summit Enterprise" in answer
     assert "281 262,43" in answer
     assert "Le client" in answer
+
+
+def test_margin_percent_ranking_gets_business_answer(monkeypatch):
+    monkeypatch.setattr("app.agents.insight_agent.llm_text", lambda *args, **kwargs: None)
+    rows = [
+        {"category": "IT", "margin_pct": 34.5},
+        {"category": "Office", "margin_pct": 21.2},
+    ]
+
+    answer = build_insight("Quelle est la marge % par categorie ?", rows, [])
+
+    assert "IT" in answer
+    assert "taux de marge" in answer
+    assert "La requete a retourne" not in answer
+
+
+def test_average_selling_price_ranking_gets_business_answer(monkeypatch):
+    monkeypatch.setattr("app.agents.insight_agent.llm_text", lambda *args, **kwargs: None)
+    rows = [
+        {"country": "France", "average_selling_price": 120.0},
+        {"country": "Maroc", "average_selling_price": 95.0},
+    ]
+
+    answer = build_insight("Quel est l'ASP par pays ?", rows, [])
+
+    assert "France" in answer
+    assert "prix de vente moyen" in answer
+    assert "La requete a retourne" not in answer
+
+
+def test_yearly_evolution_gets_comparison_answer(monkeypatch):
+    monkeypatch.setattr("app.agents.insight_agent.llm_text", lambda *args, **kwargs: None)
+    rows = [
+        {"year": 2025, "revenue": 100.0},
+        {"year": 2026, "revenue": 130.0},
+    ]
+
+    answer = build_insight("Quelle est l'evolution du chiffre d'affaires par an ?", rows, [])
+
+    assert "2025" in answer
+    assert "2026" in answer
+    assert "ecart" in answer

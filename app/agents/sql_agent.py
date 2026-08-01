@@ -35,6 +35,22 @@ def has_margin_terms(text: str) -> bool:
     return contains_any(text, ["marge", "margin"])
 
 
+def has_margin_percent_terms(text: str) -> bool:
+    return contains_any(text, ["margin pct", "margin pourcent", "marge pourcent", "marge %", "margin %", "taux de marge"])
+
+
+def has_asp_terms(text: str) -> bool:
+    return contains_any(text, ["asp", "average selling price", "prix moyen", "prix de vente moyen"])
+
+
+def has_share_terms(text: str) -> bool:
+    return contains_any(text, ["part du", "part de", "contribution", "poids du", "repartition"])
+
+
+def has_evolution_terms(text: str) -> bool:
+    return contains_any(text, ["evolution", "variation", "croissance", "progression", "tendance", "par an"])
+
+
 def has_customer_terms(text: str) -> bool:
     return contains_any(text, ["client", "clients", "customer", "customers"])
 
@@ -88,6 +104,8 @@ def detect_month(text: str) -> tuple[int, str] | None:
 
 def deterministic_sql(question: str) -> str:
     q = normalize_question(question)
+    if "%" in question and has_margin_terms(q):
+        q = f"{q} margin pct"
     year = detect_year(q)
     segment = detect_segment(q)
     month = detect_month(q)
@@ -116,6 +134,115 @@ WHERE d.year = {year}
   AND d.month = {month_number}
 ORDER BY d.full_date DESC, f.revenue DESC
 LIMIT 100
+""".strip()
+
+    if has_evolution_terms(q) and has_revenue_terms(q):
+        return """
+SELECT
+    d.year,
+    ROUND(SUM(f.revenue), 2) AS revenue
+FROM fact_sales f
+JOIN dim_date d
+    ON f.date_id = d.date_id
+GROUP BY d.year
+ORDER BY d.year
+""".strip()
+
+    if has_margin_percent_terms(q) and ("pays" in q or "country" in q):
+        date_join = "\nJOIN dim_date d\n    ON f.date_id = d.date_id" if year else ""
+        where_clause = f"\nWHERE d.year = {year}" if year else ""
+        return f"""
+SELECT
+    c.country,
+    ROUND(SUM(f.margin) * 100.0 / NULLIF(SUM(f.revenue), 0), 2) AS margin_pct
+FROM fact_sales f
+JOIN dim_customer c
+    ON f.customer_id = c.customer_id{date_join}{where_clause}
+GROUP BY c.country
+ORDER BY margin_pct DESC
+""".strip()
+
+    if has_margin_percent_terms(q) and ("categorie" in q or "category" in q):
+        date_join = "\nJOIN dim_date d\n    ON f.date_id = d.date_id" if year else ""
+        where_clause = f"\nWHERE d.year = {year}" if year else ""
+        return f"""
+SELECT
+    p.category,
+    ROUND(SUM(f.margin) * 100.0 / NULLIF(SUM(f.revenue), 0), 2) AS margin_pct
+FROM fact_sales f
+JOIN dim_product p
+    ON f.product_id = p.product_id{date_join}{where_clause}
+GROUP BY p.category
+ORDER BY margin_pct DESC
+""".strip()
+
+    if has_margin_percent_terms(q) and "segment" in q:
+        date_join = "\nJOIN dim_date d\n    ON f.date_id = d.date_id" if year else ""
+        where_clause = f"\nWHERE d.year = {year}" if year else ""
+        return f"""
+SELECT
+    c.segment,
+    ROUND(SUM(f.margin) * 100.0 / NULLIF(SUM(f.revenue), 0), 2) AS margin_pct
+FROM fact_sales f
+JOIN dim_customer c
+    ON f.customer_id = c.customer_id{date_join}{where_clause}
+GROUP BY c.segment
+ORDER BY margin_pct DESC
+""".strip()
+
+    if has_asp_terms(q) and ("pays" in q or "country" in q):
+        date_join = "\nJOIN dim_date d\n    ON f.date_id = d.date_id" if year else ""
+        where_clause = f"\nWHERE d.year = {year}" if year else ""
+        return f"""
+SELECT
+    c.country,
+    ROUND(SUM(f.revenue) / NULLIF(SUM(f.quantity), 0), 2) AS average_selling_price
+FROM fact_sales f
+JOIN dim_customer c
+    ON f.customer_id = c.customer_id{date_join}{where_clause}
+GROUP BY c.country
+ORDER BY average_selling_price DESC
+""".strip()
+
+    if has_asp_terms(q) and ("categorie" in q or "category" in q):
+        date_join = "\nJOIN dim_date d\n    ON f.date_id = d.date_id" if year else ""
+        where_clause = f"\nWHERE d.year = {year}" if year else ""
+        return f"""
+SELECT
+    p.category,
+    ROUND(SUM(f.revenue) / NULLIF(SUM(f.quantity), 0), 2) AS average_selling_price
+FROM fact_sales f
+JOIN dim_product p
+    ON f.product_id = p.product_id{date_join}{where_clause}
+GROUP BY p.category
+ORDER BY average_selling_price DESC
+""".strip()
+
+    if has_asp_terms(q) and "segment" in q:
+        date_join = "\nJOIN dim_date d\n    ON f.date_id = d.date_id" if year else ""
+        where_clause = f"\nWHERE d.year = {year}" if year else ""
+        return f"""
+SELECT
+    c.segment,
+    ROUND(SUM(f.revenue) / NULLIF(SUM(f.quantity), 0), 2) AS average_selling_price
+FROM fact_sales f
+JOIN dim_customer c
+    ON f.customer_id = c.customer_id{date_join}{where_clause}
+GROUP BY c.segment
+ORDER BY average_selling_price DESC
+""".strip()
+
+    if has_share_terms(q) and has_revenue_terms(q) and ("pays" in q or "country" in q):
+        return """
+SELECT
+    c.country,
+    ROUND(SUM(f.revenue), 2) AS revenue,
+    ROUND(SUM(f.revenue) * 100.0 / SUM(SUM(f.revenue)) OVER (), 2) AS revenue_share_pct
+FROM fact_sales f
+JOIN dim_customer c
+    ON f.customer_id = c.customer_id
+GROUP BY c.country
+ORDER BY revenue_share_pct DESC
 """.strip()
 
     if "france" in q and "maroc" in q and has_revenue_terms(q):
