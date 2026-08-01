@@ -661,29 +661,43 @@
       gap: 8px;
       max-height: 340px;
       padding: 10px;
+      background: rgba(10, 18, 28, 0.36);
     }
 
     .history-item {
       display: grid;
-      gap: 6px;
-      padding: 9px;
-      border-radius: 7px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      gap: 7px;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.13);
+      border: 1px solid rgba(255, 255, 255, 0.16);
       cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .history-item:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(66, 211, 146, 0.35);
+      transform: translateY(-1px);
     }
 
     .history-question {
-      color: #fff;
-      font-size: 12px;
-      font-weight: 750;
+      color: #ffffff;
+      font-size: 12.5px;
+      font-weight: 800;
+      line-height: 1.35;
     }
 
     .history-preview,
-    .history-resolved,
+    .history-resolved {
+      color: #e3edf5;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
     .history-status,
     .history-chip {
-      color: #c6d5e0;
+      color: #d8e5ee;
       font-size: 10px;
     }
 
@@ -697,7 +711,8 @@
     .history-route {
       padding: 3px 6px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.09);
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       font-family: var(--font-mono);
     }
 
