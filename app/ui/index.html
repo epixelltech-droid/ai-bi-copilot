@@ -7,28 +7,27 @@
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <style>
     :root {
-      --bg: #07111b;
-      --bg-glow: rgba(49, 196, 162, 0.14);
-      --surface: rgba(10, 21, 33, 0.9);
-      --surface-strong: rgba(12, 26, 40, 0.96);
-      --surface-soft: rgba(17, 33, 49, 0.92);
-      --border: rgba(123, 168, 196, 0.18);
-      --border-strong: rgba(123, 168, 196, 0.32);
-      --text: #edf5fb;
-      --text-muted: #9db1c2;
-      --text-dim: #6d8294;
-      --accent: #44d5b2;
-      --accent-hover: #2dc6a1;
-      --accent-soft: rgba(68, 213, 178, 0.14);
-      --accent-border: rgba(68, 213, 178, 0.24);
-      --accent-warm: #f1aa6b;
-      --sql: #83c7ff;
-      --rag: #f3bd8d;
-      --danger-soft: rgba(255, 122, 122, 0.14);
-      --danger: #ff9f9f;
-      --radius: 10px;
-      --font-sans: "Segoe UI", "Aptos", "Trebuchet MS", sans-serif;
-      --font-mono: "Cascadia Code", "Fira Code", Consolas, monospace;
+      --bg: #dff3fb;
+      --frame: #06111d;
+      --side: #223447;
+      --side-soft: #2b4054;
+      --main: #dff3fb;
+      --panel: rgba(238, 249, 255, 0.92);
+      --panel-strong: #f7fcff;
+      --ink: #07111d;
+      --muted: #5c7182;
+      --muted-light: #b9c8d5;
+      --line: rgba(6, 17, 29, 0.12);
+      --line-dark: rgba(255, 255, 255, 0.13);
+      --accent: #0ba5b5;
+      --accent-2: #2fe18f;
+      --accent-dark: #087383;
+      --blue: #1b77b9;
+      --orange: #e9a14d;
+      --danger: #d64545;
+      --radius: 8px;
+      --font-sans: "Segoe UI", "Aptos", Arial, sans-serif;
+      --font-mono: "Cascadia Code", Consolas, monospace;
     }
 
     * {
@@ -40,451 +39,459 @@
     body {
       min-height: 100vh;
       background:
-        radial-gradient(circle at top left, var(--bg-glow), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(241, 170, 107, 0.08), transparent 30%),
-        linear-gradient(180deg, #08131f 0%, var(--bg) 100%);
-      color: var(--text);
+        linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0)),
+        var(--bg);
+      color: var(--ink);
       font-family: var(--font-sans);
       font-size: 13px;
-      line-height: 1.5;
+      line-height: 1.45;
       -webkit-font-smoothing: antialiased;
     }
 
-    .shell {
-      max-width: 1380px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 16px 14px 22px;
-    }
-
-    .frame {
+    .page {
+      min-height: 100vh;
       display: grid;
-      gap: 12px;
-      animation: page-rise 520ms ease-out;
+      place-items: center;
+      padding: 20px;
     }
 
-    .header,
-    .composer,
-    .hero,
-    .panel,
-    .history-panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      backdrop-filter: blur(14px);
-      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.2);
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 12px;
-    }
-
-    .brand-group {
-      display: flex;
-      align-items: center;
+    .device {
+      width: min(100%, 1280px);
+      min-height: min(760px, calc(100vh - 40px));
+      display: grid;
+      grid-template-columns: 315px minmax(0, 1fr);
       gap: 10px;
+      padding: 14px;
+      border-radius: 18px;
+      background: var(--frame);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 28px 80px rgba(20, 50, 80, 0.35);
+      animation: app-in 420ms ease-out;
+    }
+
+    .sidebar {
+      display: grid;
+      grid-template-rows: auto minmax(170px, 1fr) auto;
+      gap: 12px;
+      min-width: 0;
+      padding: 12px;
+      border-radius: 12px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)),
+        var(--side);
+      color: #edf7ff;
+      border: 1px solid var(--line-dark);
+    }
+
+    .brand-row,
+    .main-top,
+    .panel-head,
+    .chat-top,
+    .controls-row,
+    .kpi-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
       min-width: 0;
     }
 
     .brand-mark {
       width: 30px;
       height: 30px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--accent) 0%, #16997b 100%);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 10px 24px rgba(68, 213, 178, 0.25);
-      color: #05241d;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex: 0 0 auto;
-    }
-
-    .brand-mark svg {
-      width: 16px;
-      height: 16px;
-      display: block;
-    }
-
-    .brand-copy {
       display: grid;
-      gap: 0;
+      place-items: center;
+      flex: 0 0 auto;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #31e78e, #0993a8);
+      color: #031117;
+      font-weight: 900;
+      box-shadow: 0 10px 24px rgba(47, 225, 143, 0.22);
     }
 
-    .app-title {
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.01em;
-      color: var(--text);
+    .brand-title {
+      font-size: 15px;
+      font-weight: 800;
       white-space: nowrap;
     }
 
-    .app-subtitle {
-      display: none;
+    .icon-btn,
+    .tiny-btn {
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.08);
+      color: inherit;
+      border-radius: 7px;
+      cursor: pointer;
+      font: inherit;
+      transition: transform 0.15s ease, background 0.15s ease;
     }
 
-    .header-status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      color: var(--text-muted);
+    .icon-btn {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+    }
+
+    .tiny-btn {
+      padding: 7px 10px;
       font-size: 11px;
-      white-space: nowrap;
+      font-weight: 700;
     }
 
-    .dot {
-      width: 7px;
-      height: 7px;
+    .icon-btn:hover,
+    .tiny-btn:hover,
+    .btn:hover,
+    .preset-chip:hover {
+      transform: translateY(-1px);
+    }
+
+    .chat-list {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .message {
+      display: grid;
+      gap: 7px;
+    }
+
+    .chat-top {
+      justify-content: start;
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
       border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 8px var(--accent);
-      display: inline-block;
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .avatar.ai {
+      background: rgba(11, 165, 181, 0.2);
+      border: 1px solid rgba(47, 225, 143, 0.35);
+    }
+
+    .chat-name {
+      color: #fff;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .chat-text,
+    .history-list {
+      color: #d6e3ed;
+      font-size: 12px;
+    }
+
+    .mini-chart {
+      min-height: 112px;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(240, 249, 255, 0.88);
+      color: #132232;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .mini-title {
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .mini-bars {
+      display: grid;
+      gap: 7px;
+    }
+
+    .mini-bar {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(6, 17, 29, 0.1);
+    }
+
+    .mini-bar span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), var(--accent-2));
     }
 
     .composer {
-      padding: 12px;
       display: grid;
-      gap: 10px;
-      animation: section-rise 560ms ease-out both;
-      animation-delay: 40ms;
+      gap: 9px;
+      padding: 10px;
+      border-radius: 9px;
+      background: rgba(238, 249, 255, 0.9);
+      color: var(--ink);
     }
 
-    .top-controls {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 180px;
-      gap: 12px;
-      align-items: end;
-    }
-
-    .field {
-      display: grid;
-      gap: 6px;
-    }
-
-    .field-label {
-      color: var(--text-dim);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
+    textarea,
     input,
-    select,
-    textarea {
+    select {
       width: 100%;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: rgba(5, 12, 20, 0.9);
-      color: var(--text);
+      border: 1px solid rgba(6, 17, 29, 0.14);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--ink);
       font: inherit;
       outline: none;
-      transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    textarea {
+      min-height: 74px;
+      resize: vertical;
+      padding: 11px 12px;
+      font-size: 13px;
     }
 
     input,
     select {
-      padding: 10px 12px;
+      padding: 9px 10px;
       font-size: 12px;
     }
 
-    textarea {
-      min-height: 88px;
-      padding: 14px 16px;
-      font-size: 15px;
-      line-height: 1.55;
-      resize: vertical;
-    }
-
-    textarea::placeholder,
-    input::placeholder {
-      color: var(--text-dim);
-    }
-
+    textarea:focus,
     input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: var(--border-strong);
-      box-shadow: 0 0 0 4px var(--accent-soft);
-      background: rgba(7, 15, 25, 0.96);
+    select:focus {
+      border-color: rgba(11, 165, 181, 0.5);
+      box-shadow: 0 0 0 3px rgba(11, 165, 181, 0.12);
     }
 
-    .controls-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
+    .field-label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
 
-    .presets-group {
+    .preset-row {
       display: flex;
-      align-items: center;
-      gap: 8px;
       flex-wrap: wrap;
+      gap: 6px;
     }
 
     .preset-chip {
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.03);
-      color: var(--text-muted);
+      padding: 6px 8px;
+      border-radius: 7px;
+      border: 1px solid rgba(6, 17, 29, 0.12);
+      background: #dff0fa;
+      color: #21415b;
       font: inherit;
       font-size: 11px;
-      line-height: 1;
       cursor: pointer;
-      white-space: nowrap;
-      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
-    }
-
-    .preset-chip:hover {
-      transform: translateY(-1px);
-      background: var(--accent-soft);
-      border-color: var(--accent-border);
-      color: var(--text);
-    }
-
-    .action-group {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      margin-left: auto;
-      flex-wrap: wrap;
     }
 
     .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      padding: 9px 14px;
+      min-height: 34px;
+      padding: 8px 12px;
+      border: 0;
       border-radius: 8px;
       font: inherit;
       font-size: 12px;
-      font-weight: 700;
-      border: none;
+      font-weight: 800;
       cursor: pointer;
-      transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
+      transition: transform 0.15s ease, opacity 0.15s ease;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--accent) 0%, #16997b 100%);
-      color: #04231b;
-      box-shadow: 0 14px 24px rgba(68, 213, 178, 0.2);
-    }
-
-    .btn-primary:hover {
-      background: linear-gradient(135deg, var(--accent-hover) 0%, #14866e 100%);
+      background: linear-gradient(135deg, #32e68d, #05a5b9);
+      color: #031117;
     }
 
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-muted);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text);
+      background: rgba(6, 17, 29, 0.08);
+      color: #23384b;
     }
 
     .btn-ghost {
       background: transparent;
-      color: var(--text-muted);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(6, 17, 29, 0.12);
+      color: #36566f;
     }
 
-    .btn-ghost:hover {
-      background: rgba(255, 255, 255, 0.06);
-      color: var(--text);
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .content-grid {
+    .main {
       display: grid;
-      grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.95fr);
-      gap: 14px;
-      align-items: start;
-    }
-
-    .main-column,
-    .side-column {
-      display: grid;
-      gap: 14px;
-    }
-
-    .hero {
-      padding: 16px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      grid-template-rows: auto auto minmax(250px, 1fr);
+      gap: 10px;
+      min-width: 0;
+      padding: 12px;
+      border-radius: 12px;
       background:
-        radial-gradient(circle at top right, rgba(68, 213, 178, 0.12), transparent 26%),
-        linear-gradient(180deg, rgba(14, 31, 45, 0.98) 0%, rgba(9, 20, 33, 0.98) 100%);
-      border-color: var(--accent-border);
-      box-shadow: 0 22px 50px rgba(0, 0, 0, 0.22);
-      position: relative;
-      overflow: hidden;
-      animation: section-rise 620ms ease-out both;
-      animation-delay: 90ms;
+        linear-gradient(180deg, rgba(13, 37, 61, 0.88), rgba(13, 37, 61, 0.35) 34%, rgba(223, 243, 251, 0.95) 34%),
+        var(--main);
+      border: 1px solid rgba(255, 255, 255, 0.18);
     }
 
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: 0 auto auto 0;
-      width: 180px;
-      height: 180px;
-      background: radial-gradient(circle, rgba(241, 170, 107, 0.14) 0%, transparent 72%);
-      pointer-events: none;
+    .main-top {
+      color: #eef9ff;
     }
 
-    .answer-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .answer-title {
+    .page-title {
       display: flex;
       align-items: center;
-      gap: 6px;
-      color: var(--accent);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      position: relative;
-      z-index: 1;
+      gap: 9px;
+      min-width: 0;
+      font-size: 16px;
+      font-weight: 900;
     }
 
-    .badges-container {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
+    .status-pill,
     .badge {
       display: inline-flex;
       align-items: center;
-      padding: 5px 9px;
-      border-radius: 999px;
+      gap: 6px;
+      white-space: nowrap;
+      border-radius: 7px;
       font-size: 11px;
-      font-weight: 600;
       font-family: var(--font-mono);
     }
 
-    .badge-sql {
-      background: rgba(78, 173, 255, 0.12);
-      border: 1px solid rgba(78, 173, 255, 0.24);
-      color: var(--sql);
+    .status-pill {
+      padding: 7px 9px;
+      background: rgba(255, 255, 255, 0.11);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #ddecf6;
     }
 
-    .badge-rag {
-      background: rgba(241, 170, 107, 0.12);
-      border: 1px solid rgba(241, 170, 107, 0.24);
-      color: var(--rag);
+    .kpi-row {
+      align-items: stretch;
     }
 
-    .badge-dax {
-      background: rgba(255, 209, 102, 0.12);
-      border: 1px solid rgba(255, 209, 102, 0.24);
-      color: #ffd166;
+    .kpi-card,
+    .panel {
+      border-radius: var(--radius);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 24px rgba(36, 83, 112, 0.12);
     }
 
-    .badge-neutral {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--text-muted);
-    }
-
-    .answer-text {
-      min-height: 88px;
-      max-width: 72ch;
-      color: #ffffff;
-      font-size: 18px;
-      font-weight: 500;
-      line-height: 1.62;
-      letter-spacing: -0.01em;
-      white-space: pre-line;
-      position: relative;
-      z-index: 1;
-    }
-
-    .answer-text::first-line {
-      color: #f6fbff;
-      font-weight: 650;
-    }
-
-    .hero-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .meta-card {
-      flex: 1 1 210px;
-      padding: 10px 11px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+    .kpi-card {
+      flex: 1 1 0;
       min-width: 0;
+      padding: 12px;
     }
 
-    .meta-label {
-      color: var(--text-dim);
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+    .kpi-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
       margin-bottom: 4px;
     }
 
-    .meta-value {
-      color: var(--text);
+    .kpi-value {
+      color: var(--ink);
+      font-size: 26px;
+      line-height: 1.05;
+      font-weight: 900;
+    }
+
+    .kpi-note {
+      margin-top: 5px;
+      color: var(--accent-dark);
       font-size: 11px;
-      line-height: 1.4;
-      word-break: break-word;
+      font-weight: 800;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .stack {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .panel {
+      padding: 12px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .panel-head {
+      margin-bottom: 9px;
+    }
+
+    .panel-title {
+      color: #132638;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .panel-subtitle {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .badge {
+      padding: 5px 8px;
+      background: rgba(6, 17, 29, 0.06);
+      color: #2b506b;
+      border: 1px solid rgba(6, 17, 29, 0.08);
+    }
+
+    .badge-sql {
+      color: #075c86;
+      background: rgba(27, 119, 185, 0.12);
+    }
+
+    .badge-rag {
+      color: #8d570d;
+      background: rgba(233, 161, 77, 0.15);
+    }
+
+    .badge-dax {
+      color: #866414;
+      background: rgba(230, 186, 63, 0.16);
+    }
+
+    .answer-text {
+      min-height: 118px;
+      color: #0b1825;
+      font-size: 17px;
+      font-weight: 650;
+      line-height: 1.55;
+      white-space: pre-line;
     }
 
     .sources-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      display: none;
       flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+      margin-top: 10px;
       padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      position: relative;
-      z-index: 1;
+      border-top: 1px solid var(--line);
     }
 
     .sources-label {
-      color: var(--text-dim);
+      color: var(--muted);
       font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
+      font-weight: 900;
       text-transform: uppercase;
     }
 
@@ -495,64 +502,51 @@
     }
 
     .source-tag {
-      padding: 4px 8px;
+      padding: 4px 7px;
       border-radius: 999px;
-      background: rgba(68, 213, 178, 0.08);
-      border: 1px solid rgba(68, 213, 178, 0.18);
-      color: var(--text-muted);
+      background: rgba(11, 165, 181, 0.12);
+      color: #075c68;
+      font-size: 10px;
       font-family: var(--font-mono);
-      font-size: 10px;
     }
 
-    .panel,
-    .history-panel {
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
-      animation: section-rise 660ms ease-out both;
+      margin-top: 10px;
     }
 
-    .panel:nth-of-type(1) {
-      animation-delay: 130ms;
+    .meta-card,
+    .stat-card {
+      padding: 9px;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(6, 17, 29, 0.08);
+      min-width: 0;
     }
 
-    .panel:nth-of-type(2),
-    .history-panel {
-      animation-delay: 170ms;
-    }
-
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    }
-
-    .panel-title {
-      color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
+    .meta-label,
+    .stat-title {
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 900;
       text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
     }
 
-    .panel-subtitle {
-      color: var(--text-dim);
-      font-size: 10px;
+    .meta-value,
+    .stat-note {
+      color: #1c3449;
+      font-size: 11px;
+      word-break: break-word;
     }
 
-    .panel-tools {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .panel-tools input {
-      min-width: 150px;
+    .stat-value {
+      color: var(--ink);
+      font-size: 18px;
+      font-weight: 900;
     }
 
     .stats-grid {
@@ -561,157 +555,185 @@
       gap: 8px;
     }
 
-    .stat-card {
-      padding: 10px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      display: grid;
-      gap: 4px;
+    .plotly-chart {
+      width: 100%;
+      min-height: 330px;
     }
 
-    .stat-title {
-      color: var(--text-dim);
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .stat-value {
-      color: var(--text);
-      font-size: 16px;
-      font-weight: 700;
-      line-height: 1.3;
-    }
-
-    .stat-note {
-      color: var(--text-muted);
-      font-size: 10px;
-      line-height: 1.4;
-    }
-
-    .code-container,
-    .table-container,
     .viz-container,
+    .table-container,
+    .code-container,
     .history-list {
-      min-height: 200px;
-      max-height: 320px;
-      overflow: auto;
       border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      background: rgba(5, 12, 20, 0.9);
+      border: 1px solid rgba(6, 17, 29, 0.08);
+      background: rgba(255, 255, 255, 0.62);
+      overflow: auto;
+    }
+
+    .viz-container {
+      min-height: 360px;
+      padding: 10px;
+    }
+
+    .table-container {
+      max-height: 285px;
     }
 
     .code-container {
       position: relative;
+      max-height: 225px;
       padding: 12px;
     }
 
     .code-block {
-      padding-right: 44px;
-      color: #d5e2ed;
+      padding-right: 58px;
+      color: #183247;
       font-family: var(--font-mono);
       font-size: 11px;
-      line-height: 1.55;
       white-space: pre-wrap;
-      word-break: break-word;
     }
 
     .copy-btn {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-muted);
+      top: 9px;
+      right: 9px;
+      padding: 5px 8px;
+      border-radius: 7px;
+      border: 1px solid rgba(6, 17, 29, 0.1);
+      background: #eef8fd;
+      color: #24445d;
       font-size: 10px;
       cursor: pointer;
     }
 
-    .copy-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text);
+    .panel-tools {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .panel-tools input {
+      width: 160px;
+      background: #f8fdff;
     }
 
     .data-table {
       width: 100%;
       border-collapse: collapse;
       font-size: 12px;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(6, 17, 29, 0.08);
+      white-space: nowrap;
       text-align: left;
     }
 
     .data-table th {
       position: sticky;
       top: 0;
-      padding: 8px 10px;
-      background: #122131;
-      color: var(--text-muted);
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      z-index: 1;
+      background: #edf8fe;
+      color: #345168;
+      font-size: 10px;
+      font-weight: 900;
       cursor: pointer;
-      user-select: none;
-    }
-
-    .data-table td {
-      padding: 9px 10px;
-      color: var(--text);
-      white-space: nowrap;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      text-transform: uppercase;
     }
 
     .data-table tr:hover td {
-      background: rgba(68, 213, 178, 0.04);
+      background: rgba(11, 165, 181, 0.07);
     }
 
     .th-label {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
 
     .sort-indicator {
-      color: var(--accent);
+      color: var(--accent-dark);
+      font-size: 9px;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 8px;
+      max-height: 340px;
+      padding: 10px;
+    }
+
+    .history-item {
+      display: grid;
+      gap: 6px;
+      padding: 9px;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+    }
+
+    .history-question {
+      color: #fff;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .history-preview,
+    .history-resolved,
+    .history-status,
+    .history-chip {
+      color: #c6d5e0;
       font-size: 10px;
     }
 
-    .viz-container {
-      padding: 12px;
-      display: grid;
-      gap: 10px;
-      align-content: start;
+    .history-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .history-chip,
+    .history-route {
+      padding: 3px 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.09);
+      font-family: var(--font-mono);
+    }
+
+    .empty-state {
+      padding: 18px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 12px;
     }
 
     .viz-list {
       display: grid;
-      gap: 10px;
+      gap: 9px;
     }
 
     .viz-row {
       display: grid;
-      gap: 6px;
+      gap: 5px;
     }
 
     .viz-meta {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      color: var(--text-muted);
+      gap: 8px;
+      color: #183247;
       font-size: 11px;
     }
 
     .viz-label {
-      color: var(--text);
-      font-weight: 600;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      font-weight: 800;
     }
 
     .viz-value {
@@ -719,405 +741,269 @@
     }
 
     .viz-track {
-      width: 100%;
-      height: 10px;
+      height: 9px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(6, 17, 29, 0.1);
       overflow: hidden;
     }
 
     .viz-fill {
       height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent) 0%, #6bbdff 100%);
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), var(--accent-2));
     }
 
     .viz-summary {
-      padding-top: 8px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
-      color: var(--text-muted);
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    .plotly-chart {
-      min-height: 320px;
-      width: 100%;
-    }
-
-    .history-list {
-      display: grid;
-      gap: 8px;
-      padding: 12px;
-      align-content: start;
-    }
-
-    .history-item {
-      padding: 10px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      display: grid;
-      gap: 8px;
-      cursor: pointer;
-      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
-    }
-
-    .history-item:hover {
-      transform: translateY(-1px);
-      border-color: rgba(68, 213, 178, 0.2);
-      background: rgba(68, 213, 178, 0.05);
-    }
-
-    .history-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .history-route {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 10px;
-      font-family: var(--font-mono);
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-muted);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .history-route.sql {
-      color: var(--sql);
-      border-color: rgba(78, 173, 255, 0.24);
-      background: rgba(78, 173, 255, 0.08);
-    }
-
-    .history-route.rag {
-      color: var(--rag);
-      border-color: rgba(241, 170, 107, 0.24);
-      background: rgba(241, 170, 107, 0.08);
-    }
-
-    .history-status {
-      color: var(--text-dim);
-      font-size: 10px;
-      font-family: var(--font-mono);
-    }
-
-    .history-question {
-      color: var(--text);
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 1.4;
-    }
-
-    .history-resolved {
-      color: var(--text-dim);
-      font-size: 10px;
-      line-height: 1.4;
-    }
-
-    .history-preview {
-      color: var(--text-muted);
-      font-size: 11px;
-      line-height: 1.4;
-    }
-
-    .history-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .history-chip {
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      color: var(--text-dim);
-      font-size: 10px;
-      font-family: var(--font-mono);
-    }
-
-    .empty-state {
-      padding: 18px;
-      text-align: center;
-      color: var(--text-dim);
+      margin-top: 10px;
+      padding-top: 9px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
       font-size: 12px;
     }
 
-    @keyframes page-rise {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
     }
 
-    @keyframes section-rise {
-      from {
-        opacity: 0;
-        transform: translateY(14px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    @keyframes app-in {
+      from { opacity: 0; transform: translateY(12px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     @media (max-width: 1050px) {
-      .content-grid {
+      .device {
         grid-template-columns: 1fr;
       }
 
-      .side-column {
-        order: -1;
+      .sidebar {
+        grid-template-rows: auto auto auto;
+      }
+
+      .dashboard-grid,
+      .kpi-row {
+        grid-template-columns: 1fr;
+        display: grid;
       }
     }
 
-    @media (max-width: 800px) {
-      .shell {
-        padding: 14px;
+    @media (max-width: 680px) {
+      .page {
+        padding: 0;
       }
 
-      .header,
-      .composer,
-      .hero,
-      .panel,
-      .history-panel {
-        padding-left: 12px;
-        padding-right: 12px;
+      .device {
+        min-height: 100vh;
+        border-radius: 0;
+        padding: 8px;
       }
 
-      .header {
-        align-items: flex-start;
+      .main {
+        padding: 9px;
+      }
+
+      .main-top,
+      .controls-row,
+      .panel-head {
+        align-items: stretch;
         flex-direction: column;
       }
 
-      .top-controls,
-      .hero-meta,
+      .meta-grid,
       .stats-grid {
         grid-template-columns: 1fr;
-      }
-
-      .controls-row {
-        align-items: stretch;
-      }
-
-      .action-group {
-        width: 100%;
-        margin-left: 0;
-        justify-content: flex-end;
-      }
-
-      .answer-header,
-      .history-top {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .frame,
-      .composer,
-      .hero,
-      .panel,
-      .history-panel {
-        animation: none;
-      }
-
-      .btn,
-      .preset-chip {
-        transition: none;
       }
     }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <div class="frame">
-      <header class="header">
-        <div class="brand-group">
-          <div class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 6h12"></path>
-              <path d="M6 12h12"></path>
-              <path d="M6 18h8"></path>
-            </svg>
+  <main class="page">
+    <section class="device">
+      <aside class="sidebar">
+        <div class="brand-row">
+          <div class="brand">
+            <div class="brand-mark">BI</div>
+            <div>
+              <div class="brand-title">Copilot BI</div>
+              <div class="chat-text">Assistant local</div>
+            </div>
           </div>
-          <div class="brand-copy">
-            <div class="app-title">AI BI Copilot</div>
-          </div>
+          <button id="historyBtn" class="icon-btn" title="Charger l'historique">...</button>
         </div>
-        <div class="header-status">
-          <span class="dot"></span>
-          <span>Local</span>
-        </div>
-      </header>
 
-      <section class="composer">
-        <div class="top-controls">
-          <div class="field">
+        <div class="chat-list">
+          <article class="message">
+            <div class="chat-top">
+              <div class="avatar">ME</div>
+              <div>
+                <div class="chat-name">Utilisateur</div>
+                <div class="chat-text">Analyse les ventes, les marges et les KPI.</div>
+              </div>
+            </div>
+          </article>
+
+          <article class="message">
+            <div class="chat-top">
+              <div class="avatar ai">CO</div>
+              <div>
+                <div class="chat-name">Copilot</div>
+                <div class="chat-text">Je route la question vers SQL ou RAG, puis je retourne une reponse tracee.</div>
+              </div>
+            </div>
+            <div class="mini-chart">
+              <div class="mini-title">Demo BI locale</div>
+              <div class="mini-bars">
+                <div class="mini-bar"><span style="width: 86%"></span></div>
+                <div class="mini-bar"><span style="width: 68%"></span></div>
+                <div class="mini-bar"><span style="width: 52%"></span></div>
+              </div>
+            </div>
+          </article>
+
+          <section>
+            <div class="panel-head">
+              <span class="chat-name">Historique</span>
+              <button id="refreshHistoryBtn" class="tiny-btn">Rafraichir</button>
+            </div>
+            <div id="historyList" class="history-list"></div>
+          </section>
+        </div>
+
+        <section class="composer">
+          <div>
             <label class="field-label" for="promptInput">Question</label>
-            <textarea id="promptInput" placeholder="Pose une question sur le chiffre d'affaires, la marge, les produits ou la documentation...">Quel est le chiffre d'affaires par pays ?</textarea>
+            <textarea id="promptInput" placeholder="Pose une question BI...">Quel est le chiffre d'affaires par pays ?</textarea>
           </div>
-          <div class="field">
+          <div>
             <label class="field-label" for="userIdInput">Utilisateur</label>
-            <input id="userIdInput" type="text" value="portfolio-user" />
+            <input id="userIdInput" type="text" value="portfolio-user">
           </div>
-        </div>
-
-        <div class="controls-row">
-          <div class="presets-group">
-            <button class="preset-chip" data-q="Quel est le chiffre d'affaires par pays ?">CA par pays</button>
-            <button class="preset-chip" data-q="Quel est le top 5 des produits en quantite ?">Top 5 produits</button>
+          <div class="preset-row">
+            <button class="preset-chip" data-q="Quel est le chiffre d'affaires par pays ?">CA pays</button>
+            <button class="preset-chip" data-q="Quel est le top 5 des produits en quantite ?">Top produits</button>
             <button class="preset-chip" data-q="Quelle est la marge % par categorie ?">Marge %</button>
-            <button class="preset-chip" data-q="Quel est l'ASP par pays ?">ASP par pays</button>
-            <button class="preset-chip" data-q="Quelle est l'evolution du chiffre d'affaires par an ?">Evolution</button>
-            <button class="preset-chip" data-q="Comment calcule-t-on l'ASP ?">Formule ASP</button>
+            <button class="preset-chip" data-q="Quel est l'ASP par pays ?">ASP</button>
+            <button class="preset-chip" data-q="Comment calcule-t-on l'ASP ?">Definition ASP</button>
           </div>
-
-          <div class="action-group">
+          <div class="controls-row">
             <select id="routeSelect">
               <option value="auto" selected>Auto</option>
               <option value="sql">SQL</option>
               <option value="rag">RAG</option>
               <option value="powerbi" disabled>DAX - bientot</option>
             </select>
-            <button id="historyBtn" class="btn btn-ghost">Historique</button>
             <button id="clearBtn" class="btn btn-secondary">Effacer</button>
             <button id="runBtn" class="btn btn-primary">Lancer</button>
           </div>
-        </div>
+        </section>
+      </aside>
+
+      <section class="main">
+        <header class="main-top">
+          <div class="page-title">
+            <span>Regional Sales Executive Summary</span>
+          </div>
+          <div class="status-pill">Engine local</div>
+        </header>
+
+        <section class="kpi-row">
+          <article class="kpi-card">
+            <div class="kpi-label">Indicateur</div>
+            <div id="statMetric" class="kpi-value">En attente</div>
+            <div id="statMetricNote" class="kpi-note">Question prete.</div>
+          </article>
+          <article class="kpi-card">
+            <div class="kpi-label">Leader</div>
+            <div id="statLeader" class="kpi-value">-</div>
+            <div id="statLeaderNote" class="kpi-note">Aucun resultat.</div>
+          </article>
+          <article class="kpi-card">
+            <div class="kpi-label">Lecture</div>
+            <div id="statReading" class="kpi-value">Local</div>
+            <div id="statReadingNote" class="kpi-note">SQL ou RAG.</div>
+          </article>
+        </section>
+
+        <section class="dashboard-grid">
+          <div class="stack">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">Business insight</div>
+                  <div class="panel-subtitle">Reponse generee</div>
+                </div>
+                <div>
+                  <span id="routeBadge" class="badge">En attente</span>
+                  <span id="auditBadge" class="badge">en attente</span>
+                  <span id="artifactBadge" class="badge">en attente</span>
+                </div>
+              </div>
+              <div id="answerText" class="answer-text">Pose une question pour afficher une reponse claire et les donnees associees.</div>
+              <div id="sourcesRow" class="sources-row">
+                <span class="sources-label">Sources</span>
+                <div id="sourcesContainer" class="sources-list"></div>
+              </div>
+              <div class="meta-grid">
+                <div class="meta-card">
+                  <div class="meta-label">Question resolue</div>
+                  <div id="resolvedQuestionValue" class="meta-value">Aucune reformulation.</div>
+                </div>
+                <div class="meta-card">
+                  <div class="meta-label">Route</div>
+                  <div id="routeMetaValue" class="meta-value">Choix automatique.</div>
+                </div>
+                <div class="meta-card">
+                  <div class="meta-label">Donnees</div>
+                  <div id="dataMetaValue" class="meta-value">Aucune ligne.</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">Graphique</div>
+                  <div class="panel-subtitle">Visualisation quand le resultat s'y prete</div>
+                </div>
+              </div>
+              <div id="vizContainer" class="viz-container"></div>
+            </section>
+          </div>
+
+          <div class="stack">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">Table</div>
+                  <div class="panel-subtitle">Tri, filtre, export</div>
+                </div>
+                <div class="panel-tools">
+                  <span id="rowCountBadge" class="badge">0 ligne</span>
+                  <input id="tableFilterInput" type="text" placeholder="Filtrer">
+                  <button id="exportCsvBtn" class="tiny-btn">Export CSV</button>
+                </div>
+              </div>
+              <div id="tableContainer" class="table-container"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">SQL</div>
+                  <div class="panel-subtitle">Artefact technique</div>
+                </div>
+              </div>
+              <div class="code-container">
+                <button id="copyCodeBtn" class="copy-btn">Copier</button>
+                <pre id="codeBlock" class="code-block">-- La requete generee apparaitra ici</pre>
+              </div>
+            </section>
+          </div>
+        </section>
       </section>
-
-      <div class="content-grid">
-        <div class="main-column">
-          <section class="hero">
-            <div class="answer-header">
-              <span class="answer-title">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
-                Reponse
-              </span>
-              <div class="badges-container">
-                <span id="routeBadge" class="badge badge-neutral">En attente</span>
-                <span id="auditBadge" class="badge badge-neutral">en attente</span>
-              </div>
-            </div>
-
-            <div id="answerText" class="answer-text">Pose une question pour afficher une reponse claire et les donnees associees.</div>
-
-            <div class="hero-meta">
-              <div class="meta-card">
-                <div class="meta-label">Question</div>
-                <div id="resolvedQuestionValue" class="meta-value">Aucune reformulation.</div>
-              </div>
-              <div class="meta-card">
-                <div class="meta-label">Route</div>
-                <div id="routeMetaValue" class="meta-value">Choix automatique.</div>
-              </div>
-              <div class="meta-card">
-                <div class="meta-label">Volume</div>
-                <div id="dataMetaValue" class="meta-value">Aucune ligne.</div>
-              </div>
-            </div>
-
-            <div id="sourcesRow" class="sources-row" style="display: none;">
-              <span class="sources-label">Sources</span>
-              <div id="sourcesContainer" class="sources-list"></div>
-            </div>
-          </section>
-
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">SQL</span>
-              <span id="artifactBadge" class="badge badge-neutral">en attente</span>
-            </div>
-            <div class="code-container">
-              <button id="copyCodeBtn" class="copy-btn">Copier</button>
-              <pre id="codeBlock" class="code-block">-- La requete generee apparaitra ici</pre>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <div>
-                <span class="panel-title">Lecture rapide</span>
-                <div class="panel-subtitle">Résumé court du résultat</div>
-              </div>
-            </div>
-            <div id="statsGrid" class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-title">Indicateur</div>
-                <div id="statMetric" class="stat-value">En attente</div>
-                <div id="statMetricNote" class="stat-note">Indicateur principal.</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-title">Leader</div>
-                <div id="statLeader" class="stat-value">En attente</div>
-                <div id="statLeaderNote" class="stat-note">Valeur tete.</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-title">Lecture</div>
-                <div id="statReading" class="stat-value">Aucune</div>
-                <div id="statReadingNote" class="stat-note">Lecture rapide.</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <div>
-                <span class="panel-title">Table</span>
-                <div class="panel-subtitle">Filtre et export</div>
-              </div>
-              <div class="panel-tools">
-                <input id="tableFilterInput" type="text" placeholder="Filtrer une valeur..." />
-                <button id="exportCsvBtn" class="btn btn-ghost">Exporter CSV</button>
-                <span id="rowCountBadge" class="badge badge-neutral">0 ligne</span>
-              </div>
-            </div>
-            <div id="tableContainer" class="table-container">
-              <div class="empty-state">Aucune ligne.</div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-header">
-              <div>
-                <span class="panel-title">Graphique</span>
-                <div class="panel-subtitle">Graphique quand utile</div>
-              </div>
-            </div>
-            <div id="vizContainer" class="viz-container">
-              <div class="empty-state">Aucun graphique disponible pour le moment.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="side-column">
-          <aside class="history-panel">
-            <div class="panel-header">
-              <div>
-                <div class="panel-title">Historique</div>
-                <div class="panel-subtitle">Questions recentes</div>
-              </div>
-              <button id="refreshHistoryBtn" class="btn btn-ghost">Actualiser</button>
-            </div>
-            <div id="historyList" class="history-list">
-              <div class="empty-state">Aucune interaction enregistree pour le moment.</div>
-            </div>
-          </aside>
-        </div>
-      </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
   <script>
     const promptInput = document.getElementById("promptInput");
@@ -1150,12 +1036,13 @@
     const statReading = document.getElementById("statReading");
     const statReadingNote = document.getElementById("statReadingNote");
     const vizContainer = document.getElementById("vizContainer");
+
     let currentRows = [];
     let currentVisibleRows = [];
     let currentSort = { column: null, direction: "asc" };
 
     function currentUserId() {
-      return (userIdInput.value || "").trim() || "portfolio-user";
+      return (userIdInput.value || "portfolio-user").trim() || "portfolio-user";
     }
 
     function escapeHtml(value) {
@@ -1164,12 +1051,12 @@
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
+        .replaceAll("'", "&#039;");
     }
 
     function formatNumber(value) {
-      if (typeof value !== "number" || Number.isNaN(value)) {
-        return String(value ?? "");
+      if (typeof value !== "number" || !Number.isFinite(value)) {
+        return String(value ?? "n/a");
       }
       return new Intl.NumberFormat("fr-FR", {
         maximumFractionDigits: 2
@@ -1181,7 +1068,6 @@
         answerText.textContent = "Aucune ligne visible a exporter en CSV.";
         return;
       }
-
       const columns = Object.keys(rows[0]);
       const lines = [
         columns.join(","),
@@ -1192,7 +1078,6 @@
           }).join(",")
         )
       ];
-
       const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -1214,7 +1099,6 @@
         routeBadge.classList.add("badge-dax");
         routeBadge.textContent = "Power BI DAX";
       } else {
-        routeBadge.classList.add("badge-neutral");
         routeBadge.textContent = route || "En attente";
       }
     }
@@ -1238,10 +1122,7 @@
 
       if (!visibleRows || visibleRows.length === 0) {
         rowCountBadge.textContent = "0 ligne";
-        const message = currentRows.length
-          ? "Aucune ligne ne correspond au filtre actuel."
-          : "Aucune donnee tabulaire retournee.";
-        tableContainer.innerHTML = `<div class="empty-state">${message}</div>`;
+        tableContainer.innerHTML = `<div class="empty-state">${currentRows.length ? "Aucune ligne ne correspond au filtre actuel." : "Aucune donnee tabulaire retournee."}</div>`;
         return;
       }
 
@@ -1269,10 +1150,9 @@
       tableContainer.querySelectorAll("th[data-column]").forEach((header) => {
         header.addEventListener("click", () => {
           const column = header.dataset.column;
-          if (!column) {
-            return;
+          if (column) {
+            toggleSort(column);
           }
-          toggleSort(column);
         });
       });
     }
@@ -1280,7 +1160,6 @@
     function getVisibleRows(rows) {
       const normalizedFilter = (tableFilterInput.value || "").trim().toLowerCase();
       let visibleRows = [...rows];
-
       if (normalizedFilter) {
         visibleRows = visibleRows.filter((row) =>
           Object.values(row).some((value) =>
@@ -1288,11 +1167,9 @@
           )
         );
       }
-
       if (!currentSort.column) {
         return visibleRows;
       }
-
       return visibleRows.sort((left, right) => compareValues(
         left[currentSort.column],
         right[currentSort.column],
@@ -1304,7 +1181,6 @@
       const fallbackLeft = left ?? "";
       const fallbackRight = right ?? "";
       let result = 0;
-
       if (typeof fallbackLeft === "number" && typeof fallbackRight === "number") {
         result = fallbackLeft - fallbackRight;
       } else {
@@ -1313,7 +1189,6 @@
           sensitivity: "base"
         });
       }
-
       return direction === "asc" ? result : -result;
     }
 
@@ -1330,7 +1205,6 @@
       if (!rows || rows.length === 0) {
         return null;
       }
-
       const columns = Object.keys(rows[0]);
       const numericColumns = columns.filter((column) =>
         rows.every((row) => typeof row[column] === "number" && Number.isFinite(row[column]))
@@ -1338,51 +1212,41 @@
       const labelColumns = columns.filter((column) =>
         rows.every((row) => typeof row[column] === "string" || row[column] === null)
       );
-
-      if (numericColumns.length === 1 && labelColumns.length >= 1) {
-        return {
-          metricColumn: numericColumns[0],
-          labelColumn: labelColumns[0]
-        };
+      if (numericColumns.length >= 1 && labelColumns.length >= 1) {
+        return { metricColumn: preferredMetric(numericColumns), labelColumn: labelColumns[0] };
       }
-
-      if (numericColumns.length === 1 && rows.length === 1) {
-        return {
-          metricColumn: numericColumns[0],
-          labelColumn: null
-        };
+      if (numericColumns.length >= 1 && rows.length === 1) {
+        return { metricColumn: preferredMetric(numericColumns), labelColumn: null };
       }
-
       return null;
+    }
+
+    function preferredMetric(columns) {
+      for (const candidate of ["revenue", "margin", "margin_pct", "average_selling_price", "revenue_share_pct", "quantity"]) {
+        if (columns.includes(candidate)) {
+          return candidate;
+        }
+      }
+      return columns[0];
     }
 
     function renderStats(rows) {
       const shape = detectDatasetShape(rows);
       if (!shape) {
         statMetric.textContent = rows && rows.length ? "Resultat" : "En attente";
-        statMetricNote.textContent = rows && rows.length
-          ? "Format libre."
-          : "Indicateur principal.";
-        statLeader.textContent = rows && rows.length ? `${rows.length} ligne${rows.length > 1 ? "s" : ""}` : "En attente";
-        statLeaderNote.textContent = rows && rows.length
-          ? "Aucun leader detecte."
-          : "Valeur tete.";
-        statReading.textContent = rows && rows.length ? "Generique" : "Aucune";
-        statReadingNote.textContent = rows && rows.length
-          ? "Lecture simple."
-          : "Classement ou total.";
+        statMetricNote.textContent = rows && rows.length ? "Format libre." : "Indicateur principal.";
+        statLeader.textContent = rows && rows.length ? `${rows.length} ligne${rows.length > 1 ? "s" : ""}` : "-";
+        statLeaderNote.textContent = rows && rows.length ? "Aucun leader detecte." : "Aucun resultat.";
+        statReading.textContent = rows && rows.length ? "Generique" : "Local";
+        statReadingNote.textContent = rows && rows.length ? "Lecture simple." : "SQL ou RAG.";
         return;
       }
 
-      const metricName = shape.metricColumn;
-      statMetric.textContent = metricName.toUpperCase();
-      statMetricNote.textContent = shape.labelColumn
-        ? `Basee sur ${shape.labelColumn}.`
-        : "Valeur unique.";
+      statMetric.textContent = shape.metricColumn.toUpperCase();
+      statMetricNote.textContent = shape.labelColumn ? `Base: ${shape.labelColumn}.` : "Valeur unique.";
 
       if (!shape.labelColumn) {
-        const value = rows[0][shape.metricColumn];
-        statLeader.textContent = formatNumber(value);
+        statLeader.textContent = formatNumber(rows[0][shape.metricColumn]);
         statLeaderNote.textContent = "Valeur principale.";
         statReading.textContent = "KPI";
         statReadingNote.textContent = "Indicateur unique.";
@@ -1392,13 +1256,10 @@
       const sortedRows = [...rows].sort((left, right) => (right[shape.metricColumn] || 0) - (left[shape.metricColumn] || 0));
       const topRow = sortedRows[0];
       const secondRow = sortedRows[1];
-
       statLeader.textContent = topRow[shape.labelColumn] || "n/a";
       statLeaderNote.textContent = `${formatNumber(topRow[shape.metricColumn])}${secondRow ? `, devant ${secondRow[shape.labelColumn]}.` : "."}`;
       statReading.textContent = rows.length > 1 ? "Classement" : "Detail";
-      statReadingNote.textContent = rows.length > 1
-        ? `${rows.length} lignes comparees.`
-        : "Une seule ligne.";
+      statReadingNote.textContent = rows.length > 1 ? `${rows.length} lignes comparees.` : "Une seule ligne.";
     }
 
     function renderVisualization(rows) {
@@ -1407,17 +1268,14 @@
         vizContainer.innerHTML = '<div class="empty-state">Pas de graphique disponible.</div>';
         return;
       }
-
       const topRows = [...rows]
         .sort((left, right) => (right[shape.metricColumn] || 0) - (left[shape.metricColumn] || 0))
         .slice(0, 8);
-
       const maxValue = Math.max(...topRows.map((row) => row[shape.metricColumn] || 0), 0);
       if (maxValue <= 0) {
         vizContainer.innerHTML = '<div class="empty-state">Valeurs insuffisantes.</div>';
         return;
       }
-
       const bars = topRows.map((row) => {
         const label = escapeHtml(row[shape.labelColumn] || "n/a");
         const value = row[shape.metricColumn] || 0;
@@ -1428,18 +1286,13 @@
               <span class="viz-label">${label}</span>
               <span class="viz-value">${escapeHtml(formatNumber(value))}</span>
             </div>
-            <div class="viz-track">
-              <div class="viz-fill" style="width: ${ratio}%"></div>
-            </div>
+            <div class="viz-track"><div class="viz-fill" style="width: ${ratio}%"></div></div>
           </div>
         `;
       }).join("");
-
       vizContainer.innerHTML = `
         <div class="viz-list">${bars}</div>
-        <div class="viz-summary">
-          Affichage des ${topRows.length} premieres lignes selon <strong>${escapeHtml(shape.metricColumn)}</strong>.
-        </div>
+        <div class="viz-summary">Affichage des ${topRows.length} premieres lignes selon <strong>${escapeHtml(shape.metricColumn)}</strong>.</div>
       `;
     }
 
@@ -1448,12 +1301,10 @@
         renderVisualization(rows);
         return;
       }
-
       if (!window.Plotly || typeof window.Plotly.newPlot !== "function") {
         renderVisualization(rows);
         return;
       }
-
       vizContainer.innerHTML = '<div id="plotlyChart" class="plotly-chart"></div>';
       const figure = visualization.figure;
       window.Plotly.newPlot(
@@ -1484,10 +1335,7 @@
     }
 
     function formatLatency(latency) {
-      if (latency === null || latency === undefined) {
-        return "n/a";
-      }
-      return `${latency} ms`;
+      return latency === null || latency === undefined ? "n/a" : `${latency} ms`;
     }
 
     function formatHistoryTime(entry) {
@@ -1508,20 +1356,16 @@
         historyList.innerHTML = '<div class="empty-state">Aucune interaction enregistree pour le moment.</div>';
         return;
       }
-
       historyList.innerHTML = entries.map((entry, index) => {
         const routeClass = entry.route === "sql" ? "sql" : entry.route === "rag" ? "rag" : "";
         const memoryText = entry.used_memory ? "memoire activee" : "memoire inactive";
         const resolved = entry.resolved_question && entry.resolved_question !== entry.question
           ? `<div class="history-resolved">Question resolue : ${escapeHtml(entry.resolved_question)}</div>`
           : "";
-        const preview = entry.answer_preview
-          ? `<div class="history-preview">${escapeHtml(entry.answer_preview)}</div>`
-          : "";
-
+        const preview = entry.answer_preview ? `<div class="history-preview">${escapeHtml(entry.answer_preview)}</div>` : "";
         return `
           <article class="history-item" data-history-index="${index}">
-            <div class="history-top">
+            <div class="chat-top">
               <span class="history-route ${routeClass}">${formatRoute(entry.route)}</span>
               <span class="history-status">${formatHistoryTime(entry)} - ${entry.status}</span>
             </div>
@@ -1558,7 +1402,6 @@
     async function loadHistory() {
       const userId = currentUserId();
       historyList.innerHTML = "<div class=\"empty-state\">Chargement de l'historique...</div>";
-
       try {
         const response = await fetch(`/api/history/${encodeURIComponent(userId)}?limit=12`);
         const body = await response.json();
@@ -1575,13 +1418,13 @@
       const q = promptInput.value.trim();
       if (!q) {
         answerText.textContent = "Saisis une question avant de lancer.";
-        routeBadge.className = "badge badge-neutral";
+        routeBadge.className = "badge";
         routeBadge.textContent = "Question vide";
         return;
       }
 
       runBtn.disabled = true;
-      runBtn.textContent = "Chargement...";
+      runBtn.textContent = "Analyse...";
       answerText.textContent = "Analyse en cours...";
       codeBlock.textContent = "-- Generation de la requete en cours...";
       tableContainer.innerHTML = '<div class="empty-state">Chargement des donnees...</div>';
@@ -1600,7 +1443,6 @@
             user_id: currentUserId()
           })
         });
-
         const data = await response.json();
         if (!response.ok) {
           throw new Error(data.detail || "La requete a echoue");
@@ -1609,7 +1451,6 @@
         updateRouteBadge(data.route);
         auditBadge.textContent = `${data.audit_id ? data.audit_id.substring(0, 8) : "ok"}`;
         artifactBadge.textContent = `${data.artifact.language || "AUCUN"}`;
-
         answerText.textContent = data.answer;
         codeBlock.textContent = data.artifact.query || "-- Aucune requete generee pour cette route";
         renderSources(data.sources);
@@ -1623,7 +1464,7 @@
         });
         await loadHistory();
       } catch (error) {
-        routeBadge.className = "badge badge-neutral";
+        routeBadge.className = "badge";
         routeBadge.textContent = "Erreur";
         auditBadge.textContent = "echec";
         artifactBadge.textContent = "erreur";
@@ -1652,7 +1493,7 @@
       tableContainer.innerHTML = '<div class="empty-state">Aucune ligne.</div>';
       vizContainer.innerHTML = '<div class="empty-state">Aucun graphique disponible pour le moment.</div>';
       sourcesRow.style.display = "none";
-      routeBadge.className = "badge badge-neutral";
+      routeBadge.className = "badge";
       routeBadge.textContent = "En attente";
       auditBadge.textContent = "en attente";
       artifactBadge.textContent = "en attente";
