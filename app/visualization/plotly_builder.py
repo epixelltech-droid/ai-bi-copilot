@@ -49,8 +49,8 @@ def _build_figure(
                         x=labels,
                         y=values,
                         mode="lines+markers",
-                        line={"color": "#44d5b2", "width": 3},
-                        marker={"color": "#f1aa6b", "size": 7},
+                        line={"color": "#0f9f8f", "width": 3},
+                        marker={"color": "#2f78b7", "size": 7},
                         hovertemplate="%{x}<br>%{y:,.2f}<extra></extra>",
                     )
                 ]
@@ -62,7 +62,7 @@ def _build_figure(
                         x=values,
                         y=labels,
                         orientation="h",
-                        marker={"color": "#44d5b2"},
+                        marker={"color": "#0f9f8f"},
                         hovertemplate="%{y}<br>%{x:,.2f}<extra></extra>",
                     )
                 ]
@@ -73,7 +73,7 @@ def _build_figure(
                     go.Bar(
                         x=labels,
                         y=values,
-                        marker={"color": "#44d5b2"},
+                        marker={"color": "#0f9f8f"},
                         hovertemplate="%{x}<br>%{y:,.2f}<extra></extra>",
                     )
                 ]
@@ -98,8 +98,8 @@ def _manual_trace(kind: str, labels: list[Any], values: list[Any]) -> dict[str, 
             "mode": "lines+markers",
             "x": labels,
             "y": values,
-            "line": {"color": "#44d5b2", "width": 3},
-            "marker": {"color": "#f1aa6b", "size": 7},
+            "line": {"color": "#0f9f8f", "width": 3},
+            "marker": {"color": "#2f78b7", "size": 7},
             "hovertemplate": "%{x}<br>%{y:,.2f}<extra></extra>",
         }
     if kind == "horizontal_bar":
@@ -108,14 +108,14 @@ def _manual_trace(kind: str, labels: list[Any], values: list[Any]) -> dict[str, 
             "orientation": "h",
             "x": values,
             "y": labels,
-            "marker": {"color": "#44d5b2"},
+            "marker": {"color": "#0f9f8f"},
             "hovertemplate": "%{y}<br>%{x:,.2f}<extra></extra>",
         }
     return {
         "type": "bar",
         "x": labels,
         "y": values,
-        "marker": {"color": "#44d5b2"},
+        "marker": {"color": "#0f9f8f"},
         "hovertemplate": "%{x}<br>%{y:,.2f}<extra></extra>",
     }
 
@@ -131,16 +131,16 @@ def _layout(
         "title": {"text": title},
         "paper_bgcolor": "rgba(0,0,0,0)",
         "plot_bgcolor": "rgba(0,0,0,0)",
-        "font": {"color": "#edf5fb"},
+        "font": {"color": "#111827"},
         "margin": {"l": 48, "r": 18, "t": 52, "b": 56},
         "xaxis": {
             "title": {"text": _humanize(label_column)},
-            "gridcolor": "rgba(255,255,255,0.08)",
+            "gridcolor": "rgba(17,24,39,0.08)",
             "tickangle": -20 if kind == "bar" and len(labels) > 4 else 0,
         },
         "yaxis": {
             "title": {"text": _humanize(metric_column)},
-            "gridcolor": "rgba(255,255,255,0.08)",
+            "gridcolor": "rgba(17,24,39,0.08)",
         },
     }
     if kind == "horizontal_bar":
