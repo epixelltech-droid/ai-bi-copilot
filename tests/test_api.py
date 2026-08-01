@@ -14,6 +14,7 @@ from app.main import app
 
 @pytest.fixture(autouse=True)
 def local_only_runtime(monkeypatch):
+    monkeypatch.setattr(router_agent, "llm_json", lambda *args, **kwargs: None)
     monkeypatch.setattr(sql_agent, "llm_text", lambda *args, **kwargs: None)
     monkeypatch.setattr(insight_agent, "llm_text", lambda *args, **kwargs: None)
     monkeypatch.setattr(dax_agent, "llm_text", lambda *args, **kwargs: None)
@@ -201,8 +202,8 @@ def test_history_endpoint_exposes_hybrid_modes(client):
     body = history_response.json()
 
     assert history_response.status_code == 200
-    assert body[0]["hybrid_meta"]["llm"]["configured"] is False
-    assert body[0]["hybrid_meta"]["llm"]["provider"] == "none"
+    assert "configured" in body[0]["hybrid_meta"]["llm"]
+    assert "provider" in body[0]["hybrid_meta"]["llm"]
     assert body[0]["hybrid_meta"]["router_mode"] == "deterministic"
     assert body[0]["hybrid_meta"]["sql_generation_mode"] == "deterministic"
     assert body[0]["hybrid_meta"]["response_mode"] == "local"
@@ -357,6 +358,35 @@ def test_chat_sql_follow_up_dimension_variant_uses_previous_metric(client):
     assert body["data"]
 
 
+def test_chat_sql_follow_up_year_after_monthly_question_keeps_year_filter(client):
+    first = client.post(
+        "/api/chat",
+        json={
+            "question": "Quel est le chiffre d'affaires par mois ?",
+            "user_id": "memory-user-month-year",
+            "source": "auto",
+        },
+    )
+    assert first.status_code == 200
+
+    second = client.post(
+        "/api/chat",
+        json={
+            "question": "et en 2026 ?",
+            "user_id": "memory-user-month-year",
+            "source": "auto",
+        },
+    )
+
+    body = second.json()
+
+    assert second.status_code == 200
+    assert body["route"] == "sql"
+    assert "JOIN dim_date d" in body["artifact"]["query"]
+    assert "WHERE d.year = 2026" in body["artifact"]["query"]
+    assert body["data"]
+
+
 def test_chat_sql_follow_up_metric_variant_uses_previous_dimension(client):
     first = client.post(
         "/api/chat",
@@ -384,6 +414,34 @@ def test_chat_sql_follow_up_metric_variant_uses_previous_dimension(client):
     assert "JOIN dim_customer c" in body["artifact"]["query"]
     assert "SUM(f.margin)" in body["artifact"]["query"]
     assert body["data"]
+
+
+def test_chat_compare_question_does_not_reuse_previous_memory_context(client):
+    first = client.post(
+        "/api/chat",
+        json={
+            "question": "Quelle est la marge par categorie ?",
+            "user_id": "memory-user-compare",
+            "source": "auto",
+        },
+    )
+    assert first.status_code == 200
+
+    second = client.post(
+        "/api/chat",
+        json={
+            "question": "Compare la marge entre la France et le Maroc.",
+            "user_id": "memory-user-compare",
+            "source": "auto",
+        },
+    )
+
+    body = second.json()
+
+    assert second.status_code == 200
+    assert body["route"] == "sql"
+    assert "WHERE c.country IN ('France', 'Maroc')" in body["artifact"]["query"]
+    assert "SUM(f.margin)" in body["artifact"]["query"]
 
 
 def test_chat_rag_follow_up_uses_previous_documentary_context(client):

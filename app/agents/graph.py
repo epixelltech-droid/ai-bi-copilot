@@ -15,6 +15,7 @@ from app.visualization.plotly_builder import build_visualization
 
 
 class CopilotState(TypedDict, total=False):
+    original_question: str
     question: str
     preferred_source: str
     route: str
@@ -30,6 +31,7 @@ class CopilotState(TypedDict, total=False):
 
 def router_node(state):
     analysis = analyze_question(state["question"], state.get("preferred_source", "auto"))
+    original_question = state.get("original_question", state["question"])
     return {
         "route": analysis["route"],
         "question": analysis["rewritten_question"],
@@ -37,8 +39,8 @@ def router_node(state):
             "llm": get_llm_runtime_info(),
             "router_mode": analysis["mode"],
             "router_reason": analysis["reason"],
-            "rewritten_by_router": analysis["rewritten_question"] != state["question"],
-            "original_question": state["question"],
+            "rewritten_by_router": analysis["rewritten_question"] != original_question,
+            "original_question": original_question,
         },
     }
 

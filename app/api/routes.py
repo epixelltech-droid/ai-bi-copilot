@@ -19,6 +19,7 @@ def chat(req: ChatRequest):
     used_memory = resolved_question != req.question and bool(history)
     try:
         result = copilot_graph.invoke({
+            "original_question": req.question,
             "question": resolved_question,
             "preferred_source": req.source,
         })

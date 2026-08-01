@@ -74,7 +74,6 @@ def _looks_like_follow_up(normalized: str) -> bool:
         "et ",
         "en 20",
         "par ",
-        "compare ",
         "maintenant ",
         "du coup ",
         "alors ",
@@ -198,6 +197,6 @@ def _build_metric_question(metric: str, dimension: str | None, year: int | None)
         else:
             question = "Quel est le chiffre d'affaires total"
 
-    if year and dimension != "par mois":
+    if year:
         return f"{question} en {year} ?"
     return f"{question} ?"

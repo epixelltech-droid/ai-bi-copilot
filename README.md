@@ -62,24 +62,45 @@ Screenshot area:
 
 - future UI captures can be stored in `docs/assets/`
 
+## AI Architecture
+
+This project follows a simple multi-agent AI architecture for BI:
+
+- `Router Agent` decides whether the question is analytical or documentary
+- `SQL Agent` generates read-only SQL on the BI star schema
+- `Insight Agent` turns raw SQL rows into business-friendly answers
+- `RAG Agent` retrieves grounded knowledge from local Markdown documents
+- `LangGraph` orchestrates the full flow between these agents
+
 ## Architecture Diagram
 
 ```mermaid
 flowchart LR
-    U[User Question] --> API[FastAPI API]
-    API --> G[LangGraph]
-    G --> R[Router]
-    R --> SQL[SQL Agent]
-    R --> RAG[RAG Agent]
-    SQL --> GUARD[SQL Guard]
+    U[User / Business User] --> UI[Local UI or API Client]
+    UI --> API[FastAPI]
+    API --> G[LangGraph Orchestrator]
+    G --> R[Router Agent]
+    R -->|Analytical question| SQL[SQL Agent]
+    R -->|Documentary question| RAG[RAG Agent]
+    SQL --> META[Schema Metadata]
+    SQL --> GUARD[Read-only SQL Guard]
+    META --> SQL
     GUARD --> DB[(SQLite Star Schema)]
     DB --> INSIGHT[Insight Agent]
     RAG --> KB[(Markdown Knowledge Base)]
-    KB --> ANSWER[RAG Answer Builder]
-    INSIGHT --> RESP[JSON Response]
-    ANSWER --> RESP
-    RESP --> AUDIT[Audit Log]
+    KB --> RETRIEVE[Retriever + Answer Builder]
+    INSIGHT --> RESP[Response JSON]
+    RETRIEVE --> RESP
+    RESP --> AUDIT[Audit / History]
 ```
+
+## Recruiter Pitch
+
+You can present the project like this:
+
+> AI BI Copilot is a local-first multi-agent BI assistant that lets business users ask questions in natural language.  
+> Analytical questions are routed to a SQL agent over a SQLite star schema, while documentary questions are routed to a local RAG engine backed by Markdown knowledge files.  
+> LangGraph orchestrates the workflow, FastAPI exposes the application, and the system returns grounded, traceable answers designed for BI use cases.
 
 ## Tech Stack
 
